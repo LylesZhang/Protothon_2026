@@ -308,30 +308,127 @@ struct SearchFilterView: View {
         searchResults = allTrips.filter { trip in
             var matches = true
             
-            // Filter by origin (from location)
+            // Filter by origin (from location) - fuzzy matching
             if !fromLocation.isEmpty {
-                matches = matches && trip.origin.localizedCaseInsensitiveContains(fromLocation)
+                matches = matches && fuzzyLocationMatch(searchTerm: fromLocation, location: trip.origin)
             }
             
-            // Filter by destination (to location)
+            // Filter by destination (to location) - fuzzy matching
             if !toLocation.isEmpty {
-                matches = matches && trip.location.localizedCaseInsensitiveContains(toLocation)
+                matches = matches && fuzzyLocationMatch(searchTerm: toLocation, location: trip.location)
             }
             
-            // Filter by tags
+            // Filter by tags - more lenient matching
             if !selectedTags.isEmpty {
                 let tripTags = Set(trip.tags)
-                // Check if trip has at least one of the selected tags
+                // Check if trip has at least one of the selected tags (more lenient)
                 matches = matches && !selectedTags.isDisjoint(with: tripTags)
             }
-            
-            // Filter by date (optional - currently not filtering by exact date)
-            // Could add date filtering logic here if needed
             
             return matches
         }
         
         showSearchResults = true
+    }
+    
+    // Fuzzy location matching with typo tolerance and partial matching
+    private func fuzzyLocationMatch(searchTerm: String, location: String) -> Bool {
+        let search = searchTerm.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        let loc = location.lowercased()
+        
+        // Direct contains match
+        if loc.contains(search) {
+            return true
+        }
+        
+        // Split into words for partial matching
+        let searchWords = search.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+        let locationWords = loc.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+        
+        // Check if any search word matches any location word (partial)
+        for searchWord in searchWords {
+            for locWord in locationWords {
+                // Exact word match
+                if locWord.contains(searchWord) || searchWord.contains(locWord) {
+                    return true
+                }
+                
+                // Fuzzy match with typo tolerance
+                if levenshteinDistance(searchWord, locWord) <= 2 {
+                    return true
+                }
+            }
+        }
+        
+        // Common location aliases and abbreviations
+        let aliases: [String: [String]] = [
+            "nyc": ["new york", "new york city", "manhattan", "brooklyn"],
+            "ny": ["new york"],
+            "philly": ["philadelphia"],
+            "la": ["los angeles"],
+            "sf": ["san francisco"],
+            "dc": ["washington"],
+            "chi": ["chicago"],
+            "bos": ["boston"],
+            "bryn mawr": ["bmc", "bryn mawr college"],
+            "haverford": ["haverford college", "hc"],
+            "swarthmore": ["swarthmore college", "swat"],
+            "penn": ["upenn", "university of pennsylvania"],
+            "princeton": ["pton", "princeton university"],
+            "ucla": ["university of california los angeles"],
+            "usc": ["university of southern california"]
+        ]
+        
+        // Check aliases
+        for (alias, fullNames) in aliases {
+            if search.contains(alias) {
+                for fullName in fullNames {
+                    if loc.contains(fullName) {
+                        return true
+                    }
+                }
+            }
+            for fullName in fullNames {
+                if search.contains(fullName) && loc.contains(alias) {
+                    return true
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    // Levenshtein distance for typo tolerance
+    private func levenshteinDistance(_ s1: String, _ s2: String) -> Int {
+        let s1 = Array(s1)
+        let s2 = Array(s2)
+        let m = s1.count
+        let n = s2.count
+        
+        if m == 0 { return n }
+        if n == 0 { return m }
+        
+        var matrix = Array(repeating: Array(repeating: 0, count: n + 1), count: m + 1)
+        
+        for i in 0...m {
+            matrix[i][0] = i
+        }
+        for j in 0...n {
+            matrix[0][j] = j
+        }
+        
+        for i in 1...m {
+            for j in 1...n {
+                let cost = s1[i-1] == s2[j-1] ? 0 : 1
+                matrix[i][j] = min(
+                    matrix[i-1][j] + 1,      // deletion
+                    matrix[i][j-1] + 1,      // insertion
+                    matrix[i-1][j-1] + cost  // substitution
+                )
+            }
+        }
+        
+        return matrix[m][n]
     }
 }
 
