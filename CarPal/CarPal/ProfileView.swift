@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct ProfileView: View {
     let username: String
@@ -99,12 +100,23 @@ struct AvatarImage: View {
     let size: CGFloat
 
     var body: some View {
-        Image("avatar")
-            .resizable()
-            .scaledToFill()
-            .frame(width: size, height: size)
-            .clipShape(Circle())
-            .overlay(Circle().stroke(Color(.systemGray4), lineWidth: 0.5))
+        Group {
+            if let uiImage = UIImage(named: "avatar") {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                ZStack {
+                    Circle().fill(Color(.systemGray5))
+                    Image(systemName: "person.fill")
+                        .font(.system(size: size * 0.42, weight: .semibold))
+                        .foregroundColor(Color(.systemGray2))
+                }
+            }
+        }
+        .frame(width: size, height: size)
+        .clipShape(Circle())
+        .overlay(Circle().stroke(Color(.systemGray4), lineWidth: 0.5))
     }
 }
 
