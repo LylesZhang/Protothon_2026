@@ -3,41 +3,28 @@ import SwiftUI
 struct MyPostsView: View {
     let username: String
 
-    @State private var myPosts: [Trip] = [
-        Trip(
-            title: "Mountain Road Trip Adventure",
-            location: "Lake Tahoe, CA",
-            setOff: "8:00 AM",
-            arrived: "12:30 PM",
-            tags: ["Pet Allow", "Prefer Female", "No Smoking"],
-            author: "Sarah Chen",
-            date: "Feb 5, 2026",
-            imageName: "mountain"
-        ),
-        Trip(
-            title: "Forest Road Nature Escape",
-            location: "Big Sur, CA",
-            setOff: "9:00 AM",
-            arrived: "2:30 PM",
-            tags: ["Pet Allow", "Music OK", "Luggage Space"],
-            author: "Sarah Chen",
-            date: "Feb 2, 2026",
-            imageName: "forest"
-        ),
-    ]
+    @StateObject private var postsManager = MyPostsManager.shared
+    @State private var showEditPost = false
+    @State private var selectedTripToEdit: Trip?
 
     private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
 
     var body: some View {
         ScrollView {
             VStack(spacing: 12) {
-                ForEach(myPosts) { trip in
-                    MyPostCard(trip: trip, brandBlue: brandBlue) {
-                        // Delete action
-                        withAnimation {
-                            myPosts.removeAll { $0.id == trip.id }
-                        }
+                ForEach(postsManager.myPosts) { trip in
+                    NavigationLink(destination: MyPostDetailView(trip: trip)) {
+                        MyPostCard(trip: trip, brandBlue: brandBlue, onEdit: {
+                            selectedTripToEdit = trip
+                            showEditPost = true
+                        }, onDelete: {
+                            // Delete action
+                            withAnimation {
+                                postsManager.deletePost(trip.id)
+                            }
+                        })
                     }
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
             .padding(.horizontal, 16)
@@ -47,6 +34,13 @@ struct MyPostsView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("My Posts")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showEditPost) {
+            if let trip = selectedTripToEdit {
+                EditPostView(trip: trip) { updatedTrip in
+                    postsManager.updatePost(updatedTrip)
+                }
+            }
+        }
     }
 }
 
@@ -55,6 +49,7 @@ struct MyPostsView: View {
 struct MyPostCard: View {
     let trip: Trip
     let brandBlue: Color
+    let onEdit: () -> Void
     let onDelete: () -> Void
 
     private let tagGreen = Color(red: 0.2, green: 0.7, blue: 0.3)
@@ -94,12 +89,13 @@ struct MyPostCard: View {
                         Text(trip.title)
                             .font(.system(size: 16, weight: .semibold))
                             .lineLimit(2)
+                            .foregroundColor(.primary)
 
                         Spacer()
 
                         // Edit button
                         Button {
-                            // TODO: edit post
+                            onEdit()
                         } label: {
                             Image(systemName: "pencil.circle")
                                 .font(.system(size: 22))

@@ -2,14 +2,14 @@ import Foundation
 
 struct Trip: Identifiable {
     let id: UUID
-    let title: String
-    let location: String
-    let setOff: String
-    let arrived: String
-    let tags: [String]
+    var title: String
+    var location: String
+    var setOff: String
+    var arrived: String
+    var tags: [String]
     let author: String
     let date: String
-    let imageName: String
+    var imageName: String
     
     // Extended fields for detail view
     let authorPronoun: String
@@ -17,8 +17,8 @@ struct Trip: Identifiable {
     let authorCollege: String
     let authorYear: String
     let authorGender: String
-    let description: String
-    let capacity: Int
+    var description: String
+    var capacity: Int
     let currentParticipants: Int
     let likes: Int
     let tripDate: Date  // Actual trip date
