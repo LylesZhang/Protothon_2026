@@ -24,6 +24,17 @@ struct Trip: Identifiable {
     let likes: Int
     let tripDate: Date  // Actual trip date
     
+    // Vehicle and cost info
+    var hasOwnCar: Bool  // Whether the trip provider has their own car
+    var costType: CostType  // Free, split, or paid
+    var estimatedCost: String?  // Optional cost details (e.g., "$20 per person")
+    
+    enum CostType: String, Codable {
+        case free = "Free Ride"
+        case split = "Split Cost"
+        case paid = "Paid Ride"
+    }
+    
     // Computed property to check if trip is finished
     var isFinished: Bool {
         return tripDate < Date()
@@ -36,7 +47,8 @@ struct Trip: Identifiable {
          authorGender: String = "Female", 
          description: String = "Looking forward to this trip!",
          capacity: Int = 3, currentParticipants: Int = 1,
-         likes: Int = 0, tripDate: Date = Date()) {
+         likes: Int = 0, tripDate: Date = Date(),
+         hasOwnCar: Bool = true, costType: CostType = .split, estimatedCost: String? = nil) {
         self.id = id
         self.title = title
         self.origin = origin
@@ -57,6 +69,9 @@ struct Trip: Identifiable {
         self.currentParticipants = currentParticipants
         self.likes = likes
         self.tripDate = tripDate
+        self.hasOwnCar = hasOwnCar
+        self.costType = costType
+        self.estimatedCost = estimatedCost
     }
 }
 
@@ -88,7 +103,10 @@ enum SampleData {
             capacity: 3,
             currentParticipants: 1,
             likes: 234,
-            tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 15))!
+            tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 15))!,
+            hasOwnCar: true,
+            costType: .split,
+            estimatedCost: "$25 per person (gas + tolls)"
         ),
         Trip(
             id: coastTripId,
@@ -102,7 +120,9 @@ enum SampleData {
             date: "Feb 4, 2026",
             imageName: "beach",
             likes: 89,
-            tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 4))!
+            tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 4))!,
+            hasOwnCar: true,
+            costType: .free
         ),
         Trip(
             id: cityTripId,
@@ -116,7 +136,10 @@ enum SampleData {
             date: "Feb 3, 2026",
             imageName: "city",
             likes: 156,
-            tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 3))!
+            tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 3))!,
+            hasOwnCar: false,
+            costType: .split,
+            estimatedCost: "$5 per person (Uber split)"
         ),
         Trip(
             id: desertTripId,
@@ -130,7 +153,10 @@ enum SampleData {
             date: "Feb 2, 2026",
             imageName: "city",
             likes: 201,
-            tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 2))!
+            tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 2))!,
+            hasOwnCar: true,
+            costType: .paid,
+            estimatedCost: "$30 per person"
         ),
     ]
 
@@ -144,7 +170,10 @@ enum SampleData {
             tags: ["Quiet Ride", "No Smoking"],
             author: "Oscar Tang",
             date: "Feb 6, 2026",
-            imageName: "airport"
+            imageName: "airport",
+            hasOwnCar: true,
+            costType: .split,
+            estimatedCost: "$10 per person"
         ),
         Trip(
             title: "King of Prussia Mall Trip",
@@ -155,7 +184,9 @@ enum SampleData {
             tags: ["Chat Welcome", "Music OK"],
             author: "Emma Wilson",
             date: "Feb 5, 2026",
-            imageName: "shopping"
+            imageName: "shopping",
+            hasOwnCar: true,
+            costType: .free
         ),
         Trip(
             title: "Philly Food Tour",
@@ -166,7 +197,10 @@ enum SampleData {
             tags: ["Music OK", "Chat Welcome", "Food Stops"],
             author: "Jordan Lee",
             date: "Feb 4, 2026",
-            imageName: "food"
+            imageName: "food",
+            hasOwnCar: false,
+            costType: .split,
+            estimatedCost: "$8 per person (Lyft)"
         ),
         Trip(
             title: "Tri-Co Campus Shuttle",
@@ -177,7 +211,9 @@ enum SampleData {
             tags: ["No Smoking", "Quiet Ride"],
             author: "Alex Kim",
             date: "Feb 3, 2026",
-            imageName: "campus"
+            imageName: "campus",
+            hasOwnCar: true,
+            costType: .free
         ),
         Trip(
             title: "Target & Trader Joe's Run",

@@ -12,6 +12,7 @@ struct MessagePreview: Identifiable {
 
 struct MessagesView: View {
     @StateObject private var messagesManager = MessagesManager.shared
+    @StateObject private var followManager = FollowManager.shared
     
     private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
 
@@ -135,6 +136,17 @@ struct MessagesView: View {
                                 .font(.system(size: 16, weight: .medium))
 
                             Spacer()
+                            
+                            // Following indicator
+                            if followManager.isFollowing(user: contact) {
+                                Text("Following")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(brandBlue)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(brandBlue.opacity(0.1))
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                            }
 
                             Image(systemName: "message")
                                 .foregroundStyle(brandBlue)

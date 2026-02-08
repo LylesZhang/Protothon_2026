@@ -32,18 +32,19 @@ struct MainTabView: View {
     }
 
     private var tabBar: some View {
-        HStack {
+        HStack(spacing: 0) {
             // Home tab
-            Spacer()
             Button {
                 selectedTab = 0
             } label: {
-                Image(systemName: selectedTab == 0 ? "house.fill" : "house")
-                    .font(.system(size: 22))
-                    .foregroundColor(selectedTab == 0 ? brandBlue : .gray)
+                VStack(spacing: 4) {
+                    Image(systemName: selectedTab == 0 ? "house.fill" : "house")
+                        .font(.system(size: 24))
+                        .foregroundColor(selectedTab == 0 ? brandBlue : .gray)
+                        .frame(height: 24)
+                }
+                .frame(maxWidth: .infinity)
             }
-
-            Spacer()
 
             // Add button (center)
             Button {
@@ -52,28 +53,30 @@ struct MainTabView: View {
                 Image(systemName: "plus")
                     .font(.system(size: 22, weight: .bold))
                     .foregroundStyle(.white)
-                    .frame(width: 52, height: 52)
+                    .frame(width: 54, height: 54)
                     .background(brandBlue)
                     .clipShape(Circle())
-                    .shadow(color: brandBlue.opacity(0.3), radius: 6, y: 3)
+                    .shadow(color: brandBlue.opacity(0.3), radius: 8, y: 3)
             }
-            .offset(y: -12)
-
-            Spacer()
+            .offset(y: -8)
+            .frame(maxWidth: .infinity)
 
             // Profile tab
             Button {
                 selectedTab = 2
             } label: {
-                Image(systemName: selectedTab == 2 ? "person.fill" : "person")
-                    .font(.system(size: 22))
-                    .foregroundColor(selectedTab == 2 ? brandBlue : .gray)
+                VStack(spacing: 4) {
+                    Image(systemName: selectedTab == 2 ? "person.fill" : "person")
+                        .font(.system(size: 24))
+                        .foregroundColor(selectedTab == 2 ? brandBlue : .gray)
+                        .frame(height: 24)
+                }
+                .frame(maxWidth: .infinity)
             }
-
-            Spacer()
         }
-        .padding(.top, 10)
-        .padding(.bottom, 20)
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 22)
         .background(
             Rectangle()
                 .fill(.white)

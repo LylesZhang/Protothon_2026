@@ -58,41 +58,67 @@ struct ProfileView: View {
     // MARK: - Profile Header
 
     private var profileHeader: some View {
-        HStack(alignment: .top, spacing: 16) {
-            // Avatar + Rating
-            VStack(spacing: 8) {
-                Button {
-                    showAvatarModal = true
-                } label: {
-                    AvatarImage(size: 90)
-                }
-
-                Text("Rating")
-                    .font(.system(size: 13))
-                    .foregroundColor(.gray)
-
-                HStack(spacing: 2) {
-                    ForEach(0..<5) { i in
-                        Image(systemName: i < 4 ? "star.fill" : "star")
-                            .font(.system(size: 14))
-                            .foregroundColor(i < 4 ? .yellow : Color(.systemGray4))
+        VStack(spacing: 16) {
+            HStack(alignment: .top, spacing: 16) {
+                // Avatar + Rating
+                VStack(spacing: 8) {
+                    Button {
+                        showAvatarModal = true
+                    } label: {
+                        AvatarImage(size: 90)
                     }
-                    Text("4.8")
-                        .font(.system(size: 14, weight: .medium))
-                        .padding(.leading, 2)
-                }
-            }
 
+                    Text("Rating")
+                        .font(.system(size: 13))
+                        .foregroundColor(.gray)
+
+                    HStack(spacing: 2) {
+                        ForEach(0..<5) { i in
+                            Image(systemName: i < 4 ? "star.fill" : "star")
+                                .font(.system(size: 14))
+                                .foregroundColor(i < 4 ? .yellow : Color(.systemGray4))
+                        }
+                        Text("4.8")
+                            .font(.system(size: 14, weight: .medium))
+                            .padding(.leading, 2)
+                    }
+                }
+
+                // Verification badge and username
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(username)
+                        .font(.system(size: 22, weight: .bold))
+                    
+                    HStack(spacing: 6) {
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(brandBlue)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Verified")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(brandBlue)
+                            Text("Haverford College Student")
+                                .font(.system(size: 12))
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .background(brandBlue.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            
             // Stats grid
-            VStack(spacing: 10) {
-                HStack(spacing: 10) {
-                    StatBox(value: "1234", label: "Likes Received")
-                    StatBox(value: "45", label: "Posts")
-                }
-                HStack(spacing: 10) {
-                    StatBox(value: "892", label: "Followers")
-                    StatBox(value: "156", label: "Following")
-                }
+            HStack(spacing: 10) {
+                StatBox(value: "1234", label: "Likes Received")
+                StatBox(value: "45", label: "Posts")
+                StatBox(value: "892", label: "Followers")
+                StatBox(value: "156", label: "Following")
             }
         }
         .padding(.horizontal, 16)

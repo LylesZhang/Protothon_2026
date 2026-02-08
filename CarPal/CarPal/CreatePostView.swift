@@ -17,6 +17,9 @@ struct CreatePostView: View {
     @State private var newTag: String = ""
     @State private var selectedImage: PhotosPickerItem?
     @State private var tripImage: UIImage?
+    @State private var hasOwnCar: Bool = true
+    @State private var costType: Trip.CostType = .split
+    @State private var estimatedCost: String = ""
     
     private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
     private let tagGreen = Color(red: 0.2, green: 0.7, blue: 0.3)
@@ -202,6 +205,80 @@ struct CreatePostView: View {
                                     .font(.system(size: 12))
                                     .foregroundColor(.gray)
                             }
+                            
+                            Divider()
+                                .padding(.vertical, 8)
+                            
+                            // Vehicle and Cost Information
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("Transportation & Cost")
+                                    .font(.system(size: 16, weight: .semibold))
+                                
+                                // Vehicle toggle
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Do you have your own car?")
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundColor(.gray)
+                                    
+                                    HStack(spacing: 12) {
+                                        Button {
+                                            hasOwnCar = true
+                                        } label: {
+                                            HStack {
+                                                Image(systemName: hasOwnCar ? "checkmark.circle.fill" : "circle")
+                                                    .foregroundColor(hasOwnCar ? brandBlue : .gray)
+                                                Text("Yes, I'm driving")
+                                                    .font(.system(size: 15))
+                                                    .foregroundColor(.primary)
+                                            }
+                                            .padding(.horizontal, 14)
+                                            .padding(.vertical, 10)
+                                            .background(hasOwnCar ? brandBlue.opacity(0.1) : Color(.systemGray6))
+                                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                                        }
+                                        
+                                        Button {
+                                            hasOwnCar = false
+                                        } label: {
+                                            HStack {
+                                                Image(systemName: !hasOwnCar ? "checkmark.circle.fill" : "circle")
+                                                    .foregroundColor(!hasOwnCar ? brandBlue : .gray)
+                                                Text("No, using rideshare")
+                                                    .font(.system(size: 15))
+                                                    .foregroundColor(.primary)
+                                            }
+                                            .padding(.horizontal, 14)
+                                            .padding(.vertical, 10)
+                                            .background(!hasOwnCar ? brandBlue.opacity(0.1) : Color(.systemGray6))
+                                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                                        }
+                                    }
+                                }
+                                
+                                // Cost type
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Cost Arrangement")
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundColor(.gray)
+                                    
+                                    VStack(spacing: 8) {
+                                        costTypeButton(.free, icon: "gift.fill", title: "Free Ride", subtitle: "No cost to participants")
+                                        costTypeButton(.split, icon: "dollarsign.circle.fill", title: "Split Cost", subtitle: "Share gas/tolls/ride cost")
+                                        costTypeButton(.paid, icon: "banknote.fill", title: "Paid Ride", subtitle: "Fixed price per person")
+                                    }
+                                }
+                                
+                                // Estimated cost (if not free)
+                                if costType != .free {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text("Estimated Cost (Optional)")
+                                            .font(.system(size: 14, weight: .medium))
+                                            .foregroundColor(.gray)
+                                        TextField("e.g., $20 per person", text: $estimatedCost)
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    }
+                                }
+                            }
                         }
                         .padding(.horizontal, 20)
                         .padding(.bottom, 100)
@@ -254,6 +331,36 @@ struct CreatePostView: View {
         !title.isEmpty && !origin.isEmpty && !destination.isEmpty && !capacity.isEmpty
     }
     
+    private func costTypeButton(_ type: Trip.CostType, icon: String, title: String, subtitle: String) -> some View {
+        Button {
+            costType = type
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 20))
+                    .foregroundColor(costType == type ? brandBlue : .gray)
+                    .frame(width: 30)
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.primary)
+                    Text(subtitle)
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
+                }
+                
+                Spacer()
+                
+                Image(systemName: costType == type ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(costType == type ? brandBlue : .gray)
+            }
+            .padding(12)
+            .background(costType == type ? brandBlue.opacity(0.08) : Color(.systemGray6))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+    }
+    
     private func createPost() {
         // Create new trip
         let newTrip = Trip(
@@ -268,7 +375,10 @@ struct CreatePostView: View {
             imageName: "mountain", // Default image
             description: description.isEmpty ? "Looking forward to this trip!" : description,
             capacity: Int(capacity) ?? 3,
-            currentParticipants: 1
+            currentParticipants: 1,
+            hasOwnCar: hasOwnCar,
+            costType: costType,
+            estimatedCost: estimatedCost.isEmpty ? nil : estimatedCost
         )
         
         print("🆕 Creating new trip: \(newTrip.title)")

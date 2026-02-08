@@ -216,7 +216,7 @@ class TripInvitationManager: ObservableObject {
         // Add sample participants for Philly trip
         if let phillyTrip = MyPostsManager.shared.myPosts.first(where: { $0.title == "Philly Center City Shopping" }) {
             tripParticipants[phillyTrip.id] = [
-                TripParticipant(name: "Sarah Chen", joinedDate: Date().addingTimeInterval(-3600 * 5))
+                TripParticipant(name: "Oscar Tang", joinedDate: Date().addingTimeInterval(-3600 * 5))
             ]
         }
     }

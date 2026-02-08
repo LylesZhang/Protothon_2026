@@ -16,6 +16,9 @@ struct EditPostView: View {
     @State private var newTag: String = ""
     @State private var selectedImage: PhotosPickerItem?
     @State private var tripImage: UIImage?
+    @State private var hasOwnCar: Bool
+    @State private var costType: Trip.CostType
+    @State private var estimatedCost: String
     
     let onSave: (Trip) -> Void
     
@@ -33,6 +36,9 @@ struct EditPostView: View {
         _arrivalWindow = State(initialValue: trip.arrived.isEmpty ? "" : trip.arrived)
         _description = State(initialValue: trip.description.isEmpty ? "" : trip.description)
         _tags = State(initialValue: trip.tags)
+        _hasOwnCar = State(initialValue: trip.hasOwnCar)
+        _costType = State(initialValue: trip.costType)
+        _estimatedCost = State(initialValue: trip.estimatedCost ?? "")
     }
     
     var body: some View {
@@ -231,6 +237,80 @@ struct EditPostView: View {
                                 .font(.system(size: 12))
                                 .foregroundColor(.gray)
                         }
+                        
+                        Divider()
+                            .padding(.vertical, 8)
+                        
+                        // Vehicle and Cost Information
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Transportation & Cost")
+                                .font(.system(size: 16, weight: .semibold))
+                            
+                            // Vehicle toggle
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Do you have your own car?")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.gray)
+                                
+                                HStack(spacing: 12) {
+                                    Button {
+                                        hasOwnCar = true
+                                    } label: {
+                                        HStack {
+                                            Image(systemName: hasOwnCar ? "checkmark.circle.fill" : "circle")
+                                                .foregroundColor(hasOwnCar ? brandBlue : .gray)
+                                            Text("Yes, I'm driving")
+                                                .font(.system(size: 15))
+                                                .foregroundColor(.primary)
+                                        }
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 10)
+                                        .background(hasOwnCar ? brandBlue.opacity(0.1) : Color(.systemGray6))
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    }
+                                    
+                                    Button {
+                                        hasOwnCar = false
+                                    } label: {
+                                        HStack {
+                                            Image(systemName: !hasOwnCar ? "checkmark.circle.fill" : "circle")
+                                                .foregroundColor(!hasOwnCar ? brandBlue : .gray)
+                                            Text("No, using rideshare")
+                                                .font(.system(size: 15))
+                                                .foregroundColor(.primary)
+                                        }
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 10)
+                                        .background(!hasOwnCar ? brandBlue.opacity(0.1) : Color(.systemGray6))
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    }
+                                }
+                            }
+                            
+                            // Cost type
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Cost Arrangement")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.gray)
+                                
+                                VStack(spacing: 8) {
+                                    costTypeButton(.free, icon: "gift.fill", title: "Free Ride", subtitle: "No cost to participants")
+                                    costTypeButton(.split, icon: "dollarsign.circle.fill", title: "Split Cost", subtitle: "Share gas/tolls/ride cost")
+                                    costTypeButton(.paid, icon: "banknote.fill", title: "Paid Ride", subtitle: "Fixed price per person")
+                                }
+                            }
+                            
+                            // Estimated cost (if not free)
+                            if costType != .free {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Estimated Cost (Optional)")
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundColor(.gray)
+                                    TextField("e.g., $20 per person", text: $estimatedCost)
+                                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                                }
+                            }
+                        }
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 100)
@@ -275,6 +355,36 @@ struct EditPostView: View {
         }
     }
     
+    private func costTypeButton(_ type: Trip.CostType, icon: String, title: String, subtitle: String) -> some View {
+        Button {
+            costType = type
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 20))
+                    .foregroundColor(costType == type ? brandBlue : .gray)
+                    .frame(width: 30)
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.primary)
+                    Text(subtitle)
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
+                }
+                
+                Spacer()
+                
+                Image(systemName: costType == type ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(costType == type ? brandBlue : .gray)
+            }
+            .padding(12)
+            .background(costType == type ? brandBlue.opacity(0.08) : Color(.systemGray6))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+    }
+    
     private func saveChanges() {
         // Update trip with new values
         var updatedTrip = trip
@@ -286,6 +396,9 @@ struct EditPostView: View {
         updatedTrip.arrived = arrivalWindow
         updatedTrip.description = description
         updatedTrip.tags = tags
+        updatedTrip.hasOwnCar = hasOwnCar
+        updatedTrip.costType = costType
+        updatedTrip.estimatedCost = estimatedCost.isEmpty ? nil : estimatedCost
         
         // Debug: Print tags before saving
         print("🏷️ Saving tags: \(tags)")

@@ -6,6 +6,7 @@ struct HomeView: View {
     @State private var selectedTab = 0
     @State private var showFilter = false
     @StateObject private var tripsManager = TripsManager.shared
+    @StateObject private var followManager = FollowManager.shared
 
     private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
     private let tabs = ["Recommended", "Following"]
@@ -26,12 +27,9 @@ struct HomeView: View {
                     }
 
                     // Trip cards - use TripsManager for real-time updates
-                    let recommendedTrips = tripsManager.allTrips.prefix(4)
-                    let followingTrips = tripsManager.allTrips.suffix(tripsManager.allTrips.count - 4)
-                    
                     let trips = selectedTab == 0
-                        ? Array(recommendedTrips)
-                        : Array(followingTrips)
+                        ? Array(tripsManager.allTrips.prefix(4))
+                        : followManager.getFollowingTrips(from: tripsManager.allTrips)
 
                     ForEach(trips) { trip in
                         NavigationLink {

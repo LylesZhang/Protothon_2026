@@ -97,6 +97,13 @@ class MessagesManager: ObservableObject {
         }
     }
     
+    func createConversationIfNeeded(with person: String) {
+        if conversations[person] == nil {
+            conversations[person] = []
+            print("💬 Created new conversation with \(person)")
+        }
+    }
+    
     private func loadInitialMessages() {
         // Load some sample messages
         
@@ -120,8 +127,40 @@ class MessagesManager: ObservableObject {
             Message(sender: "Sarah Chen", content: "Partner Invitation", timestamp: Date().addingTimeInterval(-3500), type: .invitation(nycTripInvitation))
         ]
         
+        // Oscar Tang wants to join user's trips
+        let oscarNycJoinRequest = JoinRequest(
+            tripId: MyPostsManager.shared.myPosts.first?.id ?? UUID(),
+            tripTitle: "Weekend NYC Trip",
+            destination: "New York City, NY",
+            origin: "Haverford College",
+            requesterName: "Oscar Tang",
+            conversationId: "Oscar Tang"
+        )
+        
+        let oscarPhillyJoinRequest = JoinRequest(
+            tripId: MyPostsManager.shared.myPosts.last?.id ?? UUID(),
+            tripTitle: "Philly Center City Shopping",
+            destination: "Center City Philadelphia",
+            origin: "Bryn Mawr College",
+            requesterName: "Oscar Tang",
+            conversationId: "Oscar Tang"
+        )
+        
         conversations["Oscar Tang"] = [
-            Message(sender: "Oscar Tang", content: "Sure! See you at 8 AM tomorrow.", timestamp: Date().addingTimeInterval(-7200), type: .text)
+            Message(sender: "Oscar Tang", content: "Hi Lyles! I saw your NYC trip post.", timestamp: Date().addingTimeInterval(-10800), type: .text),
+            Message(sender: "Oscar Tang", content: "I'm also planning to go to NYC that weekend and would love to join if there's still space!", timestamp: Date().addingTimeInterval(-10700), type: .text),
+            Message(sender: "You", content: "Hey Oscar! Sure, I still have spots available.", timestamp: Date().addingTimeInterval(-10500), type: .text),
+            Message(sender: "Oscar Tang", content: "That's great! The departure time works perfectly for me.", timestamp: Date().addingTimeInterval(-10400), type: .text),
+            Message(sender: "You", content: "Perfect! Let me send you a formal request to join.", timestamp: Date().addingTimeInterval(-10200), type: .text),
+            Message(sender: "Oscar Tang", content: "Join Request", timestamp: Date().addingTimeInterval(-10000), type: .joinRequest(oscarNycJoinRequest)),
+            Message(sender: "You", content: "Approved! See you at 8 AM!", timestamp: Date().addingTimeInterval(-9800), type: .text),
+            Message(sender: "Oscar Tang", content: "Awesome! Thanks! Looking forward to it.", timestamp: Date().addingTimeInterval(-9600), type: .text),
+            Message(sender: "Oscar Tang", content: "Hey! Also saw your Philly shopping trip on the 20th.", timestamp: Date().addingTimeInterval(-7200), type: .text),
+            Message(sender: "Oscar Tang", content: "Mind if I join that one too? Need to grab some things in the city.", timestamp: Date().addingTimeInterval(-7100), type: .text),
+            Message(sender: "You", content: "Of course! Happy to have you along.", timestamp: Date().addingTimeInterval(-7000), type: .text),
+            Message(sender: "Oscar Tang", content: "Join Request", timestamp: Date().addingTimeInterval(-6900), type: .joinRequest(oscarPhillyJoinRequest)),
+            Message(sender: "You", content: "Request approved! See you on the 20th at 2 PM!", timestamp: Date().addingTimeInterval(-6800), type: .text),
+            Message(sender: "Oscar Tang", content: "Perfect! Thanks again!", timestamp: Date().addingTimeInterval(-6700), type: .text)
         ]
         
         conversations["Mike Johnson"] = [

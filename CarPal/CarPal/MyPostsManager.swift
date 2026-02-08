@@ -13,7 +13,10 @@ class MyPostsManager: ObservableObject {
             tags: ["Music OK", "Chat Welcome", "No Smoking"],
             author: "Lyles Zhang",
             date: "Feb 5, 2026",
-            imageName: "city"
+            imageName: "city",
+            hasOwnCar: true,
+            costType: .split,
+            estimatedCost: "$20 per person"
         ),
         Trip(
             title: "Philly Center City Shopping",
@@ -23,8 +26,11 @@ class MyPostsManager: ObservableObject {
             arrived: "2:40 PM",
             tags: ["Music OK", "Chat Welcome"],
             author: "Lyles Zhang",
-            date: "Feb 2, 2026",
-            imageName: "shopping"
+            date: "Feb 20, 2026",
+            imageName: "shopping",
+            hasOwnCar: false,
+            costType: .split,
+            estimatedCost: "$6 per person (Uber)"
         ),
     ]
     

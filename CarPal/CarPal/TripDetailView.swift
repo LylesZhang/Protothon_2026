@@ -8,6 +8,7 @@ struct TripDetailView: View {
     @StateObject private var tripsManager = TripsManager.shared
     @StateObject private var invitationManager = TripInvitationManager.shared
     @StateObject private var myPostsManager = MyPostsManager.shared
+    @StateObject private var followManager = FollowManager.shared
     @State private var showComments = false
     @State private var showShareSheet = false
     @State private var isLiked = false
@@ -197,6 +198,29 @@ struct TripDetailView: View {
                 }
                 
                 Spacer()
+                
+                // Follow button
+                if trip.author != "Lyles Zhang" {
+                    Button {
+                        followManager.toggleFollow(user: trip.author)
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: followManager.isFollowing(user: trip.author) ? "checkmark" : "plus")
+                                .font(.system(size: 12, weight: .semibold))
+                            Text(followManager.isFollowing(user: trip.author) ? "Following" : "Follow")
+                                .font(.system(size: 13, weight: .semibold))
+                        }
+                        .foregroundColor(followManager.isFollowing(user: trip.author) ? .white : brandBlue)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(followManager.isFollowing(user: trip.author) ? brandBlue : Color.clear)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(brandBlue, lineWidth: 1.5)
+                        )
+                    }
+                }
             }
             
             // College, Year, Gender
@@ -277,6 +301,39 @@ struct TripDetailView: View {
                         .foregroundColor(.gray)
                     Text("\(trip.date), \(trip.arrived)")
                         .font(.system(size: 15, weight: .medium))
+                }
+                
+                Divider()
+                    .padding(.vertical, 4)
+                
+                // Vehicle info
+                HStack {
+                    Image(systemName: trip.hasOwnCar ? "car.fill" : "figure.walk")
+                        .foregroundColor(brandBlue)
+                    Text("Transportation:")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                    Text(trip.hasOwnCar ? "Driver's Own Car" : "Rideshare / Public Transit")
+                        .font(.system(size: 15, weight: .medium))
+                }
+                
+                // Cost info
+                HStack(alignment: .top) {
+                    Image(systemName: trip.costType == .free ? "gift.fill" : "dollarsign.circle.fill")
+                        .foregroundColor(trip.costType == .free ? tagGreen : brandBlue)
+                    Text("Cost:")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(trip.costType.rawValue)
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(trip.costType == .free ? tagGreen : .primary)
+                        if let cost = trip.estimatedCost {
+                            Text(cost)
+                                .font(.system(size: 13))
+                                .foregroundColor(.gray)
+                        }
+                    }
                 }
             }
         }
