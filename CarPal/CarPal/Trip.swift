@@ -3,6 +3,7 @@ import Foundation
 struct Trip: Identifiable {
     let id: UUID
     var title: String
+    var origin: String
     var location: String
     var setOff: String
     var arrived: String
@@ -28,16 +29,17 @@ struct Trip: Identifiable {
         return tripDate < Date()
     }
     
-    init(id: UUID = UUID(), title: String, location: String, setOff: String, arrived: String, tags: [String], 
+    init(id: UUID = UUID(), title: String, origin: String = "Haverford College", location: String, setOff: String, arrived: String, tags: [String], 
          author: String, date: String, imageName: String,
          authorPronoun: String = "they/them", authorRating: Double = 4.8, 
-         authorCollege: String = "UCLA", authorYear: String = "Junior", 
+         authorCollege: String = "Haverford College", authorYear: String = "Junior", 
          authorGender: String = "Female", 
          description: String = "Looking forward to this trip!",
          capacity: Int = 3, currentParticipants: Int = 1,
          likes: Int = 0, tripDate: Date = Date()) {
         self.id = id
         self.title = title
+        self.origin = origin
         self.location = location
         self.setOff = setOff
         self.arrived = arrived
@@ -68,20 +70,21 @@ enum SampleData {
     static let recommendedTrips: [Trip] = [
         Trip(
             id: mountainTripId,
-            title: "Mountain Road Trip Adventure",
-            location: "Lake Tahoe, CA",
+            title: "NYC Weekend Adventure",
+            origin: "Haverford College",
+            location: "New York City, NY",
             setOff: "8:00 AM - 9:00 AM",
-            arrived: "12:30 PM - 1:30 PM",
+            arrived: "10:30 AM - 11:30 AM",
             tags: ["Pet Allow", "Prefer Female", "No Smoking"],
             author: "Sarah Chen",
             date: "Feb 15, 2026",
-            imageName: "mountain",
+            imageName: "city",
             authorPronoun: "she/her",
             authorRating: 4.8,
-            authorCollege: "UCLA",
+            authorCollege: "Bryn Mawr College",
             authorYear: "Junior",
             authorGender: "Female",
-            description: "Planning a scenic drive to Lake Tahoe this weekend! Looking for someone to share the ride and split gas costs. I love listening to music and good conversation. My car has plenty of space for luggage. Let me know if you are interested!",
+            description: "Planning a weekend trip to NYC this Saturday! Looking for someone to share the ride and split gas/tolls. I love listening to music and good conversation. My car has plenty of space for luggage. Perfect for museum visits or exploring the city!",
             capacity: 3,
             currentParticipants: 1,
             likes: 234,
@@ -89,23 +92,25 @@ enum SampleData {
         ),
         Trip(
             id: coastTripId,
-            title: "Coastal Highway Scenic Drive",
-            location: "San Diego, CA",
-            setOff: "6:30 AM - 7:00 AM",
-            arrived: "10:00 AM - 10:30 AM",
+            title: "Jersey Shore Beach Day",
+            origin: "Swarthmore College",
+            location: "Ocean City, NJ",
+            setOff: "9:00 AM - 9:30 AM",
+            arrived: "11:30 AM - 12:00 PM",
             tags: ["Music OK", "Chat Welcome"],
             author: "Mike Johnson",
             date: "Feb 4, 2026",
-            imageName: "coast",
+            imageName: "beach",
             likes: 89,
             tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 4))!
         ),
         Trip(
             id: cityTripId,
-            title: "Urban City Commute Tips",
-            location: "Downtown LA",
-            setOff: "7:00 AM - 7:15 AM",
-            arrived: "8:15 AM - 8:30 AM",
+            title: "Philly Downtown Trip",
+            origin: "Bryn Mawr College",
+            location: "Center City Philadelphia",
+            setOff: "2:00 PM - 2:15 PM",
+            arrived: "2:45 PM - 3:00 PM",
             tags: ["No Smoking", "Quiet Ride"],
             author: "Amy Liu",
             date: "Feb 3, 2026",
@@ -115,14 +120,15 @@ enum SampleData {
         ),
         Trip(
             id: desertTripId,
-            title: "Desert Sunset Route",
-            location: "Palm Springs, CA",
-            setOff: "3:00 PM - 3:30 PM",
-            arrived: "5:45 PM - 6:15 PM",
+            title: "DC Museums Weekend",
+            origin: "Haverford College",
+            location: "Washington D.C.",
+            setOff: "7:00 AM - 7:30 AM",
+            arrived: "10:00 AM - 10:30 AM",
             tags: ["Pet Allow", "Music OK"],
             author: "Carlos Ruiz",
             date: "Feb 2, 2026",
-            imageName: "desert",
+            imageName: "city",
             likes: 201,
             tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 2))!
         ),
@@ -130,56 +136,61 @@ enum SampleData {
 
     static let followingTrips: [Trip] = [
         Trip(
-            title: "Philly Airport Express",
-            location: "Philadelphia, PA",
+            title: "PHL Airport Run",
+            origin: "Haverford College",
+            location: "Philadelphia Intl Airport",
             setOff: "5:00 AM",
-            arrived: "5:45 AM",
+            arrived: "5:35 AM",
             tags: ["Quiet Ride", "No Smoking"],
             author: "Oscar Tang",
             date: "Feb 6, 2026",
             imageName: "airport"
         ),
         Trip(
-            title: "Weekend Walmart Run",
-            location: "Cherry Hill, NJ",
-            setOff: "10:00 AM",
-            arrived: "10:30 AM",
-            tags: ["Chat Welcome", "Pet Allow"],
-            author: "Shaun Jin",
+            title: "King of Prussia Mall Trip",
+            origin: "Bryn Mawr College",
+            location: "King of Prussia, PA",
+            setOff: "1:00 PM",
+            arrived: "1:25 PM",
+            tags: ["Chat Welcome", "Music OK"],
+            author: "Emma Wilson",
             date: "Feb 5, 2026",
             imageName: "shopping"
         ),
         Trip(
-            title: "Downtown Food Tour Drive",
-            location: "Washington, D.C.",
+            title: "Philly Food Tour",
+            origin: "Swarthmore College",
+            location: "Reading Terminal Market",
             setOff: "11:00 AM",
-            arrived: "12:00 PM",
+            arrived: "11:30 AM",
             tags: ["Music OK", "Chat Welcome", "Food Stops"],
-            author: "Jose Andres",
+            author: "Jordan Lee",
             date: "Feb 4, 2026",
             imageName: "food"
         ),
         Trip(
-            title: "Campus Carpool to UPenn",
-            location: "University City, PA",
-            setOff: "8:00 AM",
-            arrived: "8:25 AM",
+            title: "Tri-Co Campus Shuttle",
+            origin: "Haverford College",
+            location: "Swarthmore College",
+            setOff: "9:00 AM",
+            arrived: "9:25 AM",
             tags: ["No Smoking", "Quiet Ride"],
-            author: "Oscar Tang",
+            author: "Alex Kim",
             date: "Feb 3, 2026",
             imageName: "campus"
         ),
         Trip(
-            title: "Jersey Shore Day Trip",
-            location: "Atlantic City, NJ",
-            setOff: "9:00 AM",
-            arrived: "10:30 AM",
-            tags: ["Music OK", "Pet Allow"],
-            author: "Shaun Jin",
+            title: "Target & Trader Joe's Run",
+            origin: "Bryn Mawr College",
+            location: "Ardmore, PA",
+            setOff: "3:00 PM",
+            arrived: "3:15 PM",
+            tags: ["Music OK", "Chat Welcome"],
+            author: "Maya Patel",
             date: "Feb 1, 2026",
-            imageName: "beach"
+            imageName: "shopping"
         ),
     ]
 
-    static let lylesRecentDestinations = ["Walmart", "Philadelphia Intl Airport"]
+    static let lylesRecentDestinations = ["King of Prussia Mall", "Philadelphia Intl Airport"]
 }

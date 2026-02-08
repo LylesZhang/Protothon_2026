@@ -5,24 +5,26 @@ class MyPostsManager: ObservableObject {
     
     @Published var myPosts: [Trip] = [
         Trip(
-            title: "Mountain Road Trip Adventure",
-            location: "Lake Tahoe, CA",
+            title: "Weekend NYC Trip",
+            origin: "Haverford College",
+            location: "New York City, NY",
             setOff: "8:00 AM",
-            arrived: "12:30 PM",
-            tags: ["Pet Allow", "Prefer Female", "No Smoking"],
-            author: "Sarah Chen",
+            arrived: "10:30 AM",
+            tags: ["Music OK", "Chat Welcome", "No Smoking"],
+            author: "Lyles Zhang",
             date: "Feb 5, 2026",
-            imageName: "mountain"
+            imageName: "city"
         ),
         Trip(
-            title: "Forest Road Nature Escape",
-            location: "Big Sur, CA",
-            setOff: "9:00 AM",
-            arrived: "2:30 PM",
-            tags: ["Pet Allow", "Music OK", "Luggage Space"],
-            author: "Sarah Chen",
+            title: "Philly Center City Shopping",
+            origin: "Bryn Mawr College",
+            location: "Center City Philadelphia",
+            setOff: "2:00 PM",
+            arrived: "2:40 PM",
+            tags: ["Music OK", "Chat Welcome"],
+            author: "Lyles Zhang",
             date: "Feb 2, 2026",
-            imageName: "forest"
+            imageName: "shopping"
         ),
     ]
     

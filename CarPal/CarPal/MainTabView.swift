@@ -27,7 +27,7 @@ struct MainTabView: View {
         }
         .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $showAddTrip) {
-            AddTripPlaceholderView()
+            CreatePostView()
         }
     }
 

@@ -203,6 +203,16 @@ struct TripDetailView: View {
             
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
+                    Image(systemName: "location.circle.fill")
+                        .foregroundColor(brandBlue)
+                    Text("From:")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                    Text(trip.origin)
+                        .font(.system(size: 15, weight: .medium))
+                }
+                
+                HStack {
                     Image(systemName: "mappin.circle.fill")
                         .foregroundColor(brandBlue)
                     Text("Destination:")

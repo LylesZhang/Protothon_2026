@@ -6,6 +6,7 @@ struct EditPostView: View {
     
     let trip: Trip
     @State private var title: String
+    @State private var origin: String
     @State private var destination: String
     @State private var capacity: String
     @State private var departureWindow: String
@@ -25,6 +26,7 @@ struct EditPostView: View {
         self.trip = trip
         self.onSave = onSave
         _title = State(initialValue: trip.title)
+        _origin = State(initialValue: trip.origin)
         _destination = State(initialValue: trip.location)
         _capacity = State(initialValue: String(trip.capacity))
         _departureWindow = State(initialValue: trip.setOff)
@@ -80,6 +82,21 @@ struct EditPostView: View {
                                 .foregroundColor(.gray)
                             TextField("Mountain Road Trip Adventure", text: $title)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                        }
+                        
+                        // Origin
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Departure From")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.gray)
+                            HStack {
+                                Image(systemName: "location")
+                                    .foregroundColor(.gray)
+                                TextField("UCLA", text: $origin)
+                            }
+                            .padding(8)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(8)
                         }
                         
                         HStack(spacing: 12) {
@@ -262,6 +279,7 @@ struct EditPostView: View {
         // Update trip with new values
         var updatedTrip = trip
         updatedTrip.title = title
+        updatedTrip.origin = origin
         updatedTrip.location = destination
         updatedTrip.capacity = Int(capacity) ?? trip.capacity
         updatedTrip.setOff = departureWindow
