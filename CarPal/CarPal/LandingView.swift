@@ -19,7 +19,7 @@ struct LandingView: View {
                 // Tagline
                 Text("Ride with a pal, not a stranger")
                     .font(.system(size: 17))
-                    .foregroundStyle(.gray)
+                    .foregroundColor(.gray)
                     .padding(.top, 8)
 
                 Spacer()

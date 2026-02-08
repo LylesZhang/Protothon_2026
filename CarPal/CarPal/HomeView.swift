@@ -3,8 +3,8 @@ import SwiftUI
 struct HomeView: View {
     let username: String
 
-    @State private var searchText = ""
     @State private var selectedTab = 0
+    @State private var showFilter = false
 
     private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
     private let tabs = ["Recommended", "Following"]
@@ -40,20 +40,28 @@ struct HomeView: View {
             Spacer(minLength: 0)
         }
         .background(Color(.systemGroupedBackground))
+        .sheet(isPresented: $showFilter) {
+            SearchFilterView()
+        }
     }
 
     // MARK: - Search Bar
 
     private var searchBar: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(.gray)
-            TextField("Find your ride", text: $searchText)
-                .autocorrectionDisabled()
+        Button {
+            showFilter = true
+        } label: {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.gray)
+                Text("Find your ride")
+                    .foregroundColor(.gray)
+                Spacer()
+            }
+            .padding(14)
+            .background(Color(.systemGray6))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
-        .padding(14)
-        .background(Color(.systemGray6))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
         .padding(.top, 8)
     }
 
@@ -89,7 +97,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Recently Searched Destinations")
                 .font(.system(size: 15))
-                .foregroundStyle(.gray)
+                .foregroundColor(.gray)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
@@ -188,7 +196,7 @@ struct TripCard: View {
             HStack {
                 Text("\(trip.author)  ·  \(trip.date)")
                     .font(.system(size: 13))
-                    .foregroundStyle(.gray)
+                    .foregroundColor(.gray)
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 10)

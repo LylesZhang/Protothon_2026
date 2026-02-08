@@ -15,6 +15,7 @@
 		AA0001010000000000000006 /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000006 /* Trip.swift */; };
 		AA0001010000000000000007 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000007 /* HomeView.swift */; };
 		AA0001010000000000000008 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000008 /* MainTabView.swift */; };
+		AA0001010000000000000009 /* SearchFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000009 /* SearchFilterView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		AA0002010000000000000006 /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
 		AA0002010000000000000007 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		AA0002010000000000000008 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		AA0002010000000000000009 /* SearchFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilterView.swift; sourceTree = "<group>"; };
 		AA0003010000000000000001 /* CarPal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarPal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -58,6 +60,7 @@
 				AA0002010000000000000006 /* Trip.swift */,
 				AA0002010000000000000007 /* HomeView.swift */,
 				AA0002010000000000000008 /* MainTabView.swift */,
+				AA0002010000000000000009 /* SearchFilterView.swift */,
 				AA0002010000000000000005 /* Assets.xcassets */,
 			);
 			path = CarPal;
@@ -147,6 +150,7 @@
 				AA0001010000000000000006 /* Trip.swift in Sources */,
 				AA0001010000000000000007 /* HomeView.swift in Sources */,
 				AA0001010000000000000008 /* MainTabView.swift in Sources */,
+				AA0001010000000000000009 /* SearchFilterView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

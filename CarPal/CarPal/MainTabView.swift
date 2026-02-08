@@ -99,7 +99,7 @@ struct ProfilePlaceholderView: View {
             Text(username)
                 .font(.system(size: 24, weight: .bold))
             Text("Profile page coming soon")
-                .foregroundStyle(.gray)
+                .foregroundColor(.gray)
             Spacer()
         }
     }
@@ -120,7 +120,7 @@ struct AddTripPlaceholderView: View {
                 Text("Post a new trip")
                     .font(.system(size: 20, weight: .semibold))
                 Text("Coming soon")
-                    .foregroundStyle(.gray)
+                    .foregroundColor(.gray)
                 Spacer()
             }
             .navigationTitle("New Trip")
