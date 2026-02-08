@@ -8,7 +8,13 @@ struct TripDetailView: View {
     @State private var showComments = false
     @State private var showShareSheet = false
     @State private var isLiked = false
+    @State private var likesCount: Int
     @State private var navigateToMessages = false
+    
+    init(trip: Trip) {
+        self.trip = trip
+        _likesCount = State(initialValue: trip.likes)
+    }
     
     private var isSaved: Bool {
         savedTripsManager.isSaved(tripId: trip.id)
@@ -99,7 +105,7 @@ struct TripDetailView: View {
             CommentsView(tripTitle: trip.title)
         }
         .sheet(isPresented: $showShareSheet) {
-            SharePostView(tripTitle: trip.title)
+            SharePostView(tripTitle: trip.title, tripId: trip.id)
         }
         .navigationDestination(isPresented: $navigateToMessages) {
             ChatView(contactName: trip.author)
@@ -314,7 +320,7 @@ struct TripDetailView: View {
                 Image(systemName: "heart.fill")
                     .foregroundColor(.red)
                     .font(.system(size: 14))
-                Text("\(trip.likes) likes")
+                Text("\(likesCount) likes")
                     .font(.system(size: 15))
                     .foregroundColor(.gray)
             }
@@ -357,6 +363,11 @@ struct TripDetailView: View {
             // Like
             Button {
                 isLiked.toggle()
+                if isLiked {
+                    likesCount += 1
+                } else {
+                    likesCount -= 1
+                }
             } label: {
                 VStack(spacing: 4) {
                     Image(systemName: isLiked ? "heart.fill" : "heart")
@@ -489,7 +500,17 @@ struct CommentsView: View {
                     
                     Button {
                         if !commentText.isEmpty {
-                            // TODO: Send comment
+                            let formatter = DateFormatter()
+                            formatter.dateFormat = "h:mm a"
+                            let timeString = formatter.string(from: Date())
+                            let relativeTime = "Just now"
+                            
+                            comments.append(Comment(
+                                authorName: "You",
+                                text: commentText,
+                                time: relativeTime,
+                                replies: []
+                            ))
                             commentText = ""
                         }
                     } label: {
@@ -603,12 +624,23 @@ struct CommentRow: View {
 
 struct SharePostView: View {
     let tripTitle: String
+    let tripId: UUID
     @Environment(\.dismiss) private var dismiss
     
     @State private var selectedPeople: Set<String> = []
+    @State private var searchText = ""
+    @State private var showAlert = false
     
     private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
-    private let people = ["Mike Johnson", "Emma Wilson", "Alex Rivera", "James Park", "Lisa Thompson"]
+    private let allPeople = ["Mike Johnson", "Emma Wilson", "Alex Rivera", "James Park", "Lisa Thompson", 
+                             "Sarah Chen", "Oscar Tang", "Shaun Jin", "Jose Andres", "Amy Liu", "Carlos Ruiz"]
+    
+    private var filteredPeople: [String] {
+        if searchText.isEmpty {
+            return allPeople
+        }
+        return allPeople.filter { $0.lowercased().contains(searchText.lowercased()) }
+    }
     
     var body: some View {
         NavigationStack {
@@ -625,17 +657,39 @@ struct SharePostView: View {
                 .padding(20)
                 .background(Color(.systemGray6))
                 
+                // Search bar
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray)
+                    TextField("Search people", text: $searchText)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                    if !searchText.isEmpty {
+                        Button {
+                            searchText = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.gray)
+                        }
+                    }
+                }
+                .padding(10)
+                .background(Color(.systemGray6))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                
                 Text("Select people to share with:")
                     .font(.system(size: 14))
                     .foregroundColor(.gray)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 20)
-                    .padding(.top, 20)
+                    .padding(.bottom, 8)
                 
                 // People list
                 ScrollView {
                     VStack(spacing: 0) {
-                        ForEach(people, id: \.self) { person in
+                        ForEach(filteredPeople, id: \.self) { person in
                             Button {
                                 if selectedPeople.contains(person) {
                                     selectedPeople.remove(person)
@@ -672,7 +726,7 @@ struct SharePostView: View {
                                 .padding(.vertical, 12)
                             }
                             
-                            if person != people.last {
+                            if person != filteredPeople.last {
                                 Divider()
                                     .padding(.leading, 78)
                             }
@@ -682,8 +736,7 @@ struct SharePostView: View {
                 
                 // Share button
                 Button {
-                    // TODO: Share functionality
-                    dismiss()
+                    shareTrip()
                 } label: {
                     Text("Share with \(selectedPeople.count) people")
                         .font(.system(size: 16, weight: .semibold))
@@ -708,7 +761,32 @@ struct SharePostView: View {
                     }
                 }
             }
+            .alert("Trip Shared!", isPresented: $showAlert) {
+                Button("OK") {
+                    dismiss()
+                }
+            } message: {
+                Text("The trip link has been sent to \(selectedPeople.count) people. They can tap the link to view trip details.")
+            }
         }
+    }
+    
+    private func shareTrip() {
+        // Generate a deep link for the trip
+        let tripLink = "carpal://trip/\(tripId.uuidString)"
+        
+        // In a real app, this would:
+        // 1. Send a message to each selected person with the link
+        // 2. The link would deep link to TripDetailView when tapped
+        // For now, we'll show an alert
+        
+        // Simulate sending message with link
+        for person in selectedPeople {
+            // sendMessage(to: person, message: "Check out this trip: \(tripTitle)\n\(tripLink)")
+            print("Sent to \(person): Check out this trip: \(tripTitle)\nLink: \(tripLink)")
+        }
+        
+        showAlert = true
     }
 }
 
