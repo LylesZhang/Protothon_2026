@@ -16,7 +16,7 @@ struct MainTabView: View {
                 case 0:
                     HomeView(username: username)
                 case 2:
-                    ProfilePlaceholderView(username: username)
+                    ProfileView(username: username)
                 default:
                     HomeView(username: username)
                 }
@@ -40,7 +40,7 @@ struct MainTabView: View {
             } label: {
                 Image(systemName: selectedTab == 0 ? "house.fill" : "house")
                     .font(.system(size: 22))
-                    .foregroundStyle(selectedTab == 0 ? brandBlue : .gray)
+                    .foregroundColor(selectedTab == 0 ? brandBlue : .gray)
             }
 
             Spacer()
@@ -67,7 +67,7 @@ struct MainTabView: View {
             } label: {
                 Image(systemName: selectedTab == 2 ? "person.fill" : "person")
                     .font(.system(size: 22))
-                    .foregroundStyle(selectedTab == 2 ? brandBlue : .gray)
+                    .foregroundColor(selectedTab == 2 ? brandBlue : .gray)
             }
 
             Spacer()

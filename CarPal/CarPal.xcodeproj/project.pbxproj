@@ -16,6 +16,11 @@
 		AA0001010000000000000007 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000007 /* HomeView.swift */; };
 		AA0001010000000000000008 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000008 /* MainTabView.swift */; };
 		AA0001010000000000000009 /* SearchFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000009 /* SearchFilterView.swift */; };
+		AA000101000000000000000A /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000201000000000000000A /* ProfileView.swift */; };
+		AA000101000000000000000B /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000201000000000000000B /* HistoryView.swift */; };
+		AA000101000000000000000C /* MessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000201000000000000000C /* MessagesView.swift */; };
+		AA000101000000000000000D /* MyPostsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000201000000000000000D /* MyPostsView.swift */; };
+		AA000101000000000000000E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000201000000000000000E /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +33,11 @@
 		AA0002010000000000000007 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		AA0002010000000000000008 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		AA0002010000000000000009 /* SearchFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilterView.swift; sourceTree = "<group>"; };
+		AA000201000000000000000A /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		AA000201000000000000000B /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		AA000201000000000000000C /* MessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesView.swift; sourceTree = "<group>"; };
+		AA000201000000000000000D /* MyPostsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPostsView.swift; sourceTree = "<group>"; };
+		AA000201000000000000000E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AA0003010000000000000001 /* CarPal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarPal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -61,6 +71,11 @@
 				AA0002010000000000000007 /* HomeView.swift */,
 				AA0002010000000000000008 /* MainTabView.swift */,
 				AA0002010000000000000009 /* SearchFilterView.swift */,
+				AA000201000000000000000A /* ProfileView.swift */,
+				AA000201000000000000000B /* HistoryView.swift */,
+				AA000201000000000000000C /* MessagesView.swift */,
+				AA000201000000000000000D /* MyPostsView.swift */,
+				AA000201000000000000000E /* SettingsView.swift */,
 				AA0002010000000000000005 /* Assets.xcassets */,
 			);
 			path = CarPal;
@@ -151,6 +166,11 @@
 				AA0001010000000000000007 /* HomeView.swift in Sources */,
 				AA0001010000000000000008 /* MainTabView.swift in Sources */,
 				AA0001010000000000000009 /* SearchFilterView.swift in Sources */,
+				AA000101000000000000000A /* ProfileView.swift in Sources */,
+				AA000101000000000000000B /* HistoryView.swift in Sources */,
+				AA000101000000000000000C /* MessagesView.swift in Sources */,
+				AA000101000000000000000D /* MyPostsView.swift in Sources */,
+				AA000101000000000000000E /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
