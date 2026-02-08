@@ -12,6 +12,9 @@
 		AA0001010000000000000003 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000003 /* LoginView.swift */; };
 		AA0001010000000000000004 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000004 /* SignUpView.swift */; };
 		AA0001010000000000000005 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000005 /* Assets.xcassets */; };
+		AA0001010000000000000006 /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000006 /* Trip.swift */; };
+		AA0001010000000000000007 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000007 /* HomeView.swift */; };
+		AA0001010000000000000008 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000008 /* MainTabView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +23,9 @@
 		AA0002010000000000000003 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		AA0002010000000000000004 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		AA0002010000000000000005 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA0002010000000000000006 /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
+		AA0002010000000000000007 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		AA0002010000000000000008 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		AA0003010000000000000001 /* CarPal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarPal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -49,6 +55,9 @@
 				AA0002010000000000000002 /* LandingView.swift */,
 				AA0002010000000000000003 /* LoginView.swift */,
 				AA0002010000000000000004 /* SignUpView.swift */,
+				AA0002010000000000000006 /* Trip.swift */,
+				AA0002010000000000000007 /* HomeView.swift */,
+				AA0002010000000000000008 /* MainTabView.swift */,
 				AA0002010000000000000005 /* Assets.xcassets */,
 			);
 			path = CarPal;
@@ -135,6 +144,9 @@
 				AA0001010000000000000002 /* LandingView.swift in Sources */,
 				AA0001010000000000000003 /* LoginView.swift in Sources */,
 				AA0001010000000000000004 /* SignUpView.swift in Sources */,
+				AA0001010000000000000006 /* Trip.swift in Sources */,
+				AA0001010000000000000007 /* HomeView.swift in Sources */,
+				AA0001010000000000000008 /* MainTabView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
