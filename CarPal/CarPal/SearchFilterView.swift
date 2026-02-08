@@ -10,6 +10,8 @@ struct SearchFilterView: View {
     @State private var selectedTags: Set<String> = []
     @State private var customTagText = ""
     @State private var customTags: [String] = []
+    @State private var showSearchResults = false
+    @State private var searchResults: [Trip] = []
 
     private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
 
@@ -53,7 +55,7 @@ struct SearchFilterView: View {
 
                     // MARK: - Search Button
                     Button {
-                        dismiss()
+                        performSearch()
                     } label: {
                         Text("Search")
                             .font(.system(size: 18, weight: .semibold))
@@ -70,6 +72,14 @@ struct SearchFilterView: View {
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Find Your Ride")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(isPresented: $showSearchResults) {
+                SearchResultsView(
+                    results: searchResults,
+                    fromLocation: fromLocation,
+                    toLocation: toLocation,
+                    selectedTags: Array(selectedTags)
+                )
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -288,6 +298,40 @@ struct SearchFilterView: View {
                 }
             }
         }
+    }
+    
+    // MARK: - Search Logic
+    
+    private func performSearch() {
+        let allTrips = TripsManager.shared.allTrips
+        
+        searchResults = allTrips.filter { trip in
+            var matches = true
+            
+            // Filter by origin (from location)
+            if !fromLocation.isEmpty {
+                matches = matches && trip.origin.localizedCaseInsensitiveContains(fromLocation)
+            }
+            
+            // Filter by destination (to location)
+            if !toLocation.isEmpty {
+                matches = matches && trip.location.localizedCaseInsensitiveContains(toLocation)
+            }
+            
+            // Filter by tags
+            if !selectedTags.isEmpty {
+                let tripTags = Set(trip.tags)
+                // Check if trip has at least one of the selected tags
+                matches = matches && !selectedTags.isDisjoint(with: tripTags)
+            }
+            
+            // Filter by date (optional - currently not filtering by exact date)
+            // Could add date filtering logic here if needed
+            
+            return matches
+        }
+        
+        showSearchResults = true
     }
 }
 

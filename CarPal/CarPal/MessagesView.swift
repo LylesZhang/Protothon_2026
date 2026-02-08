@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct Message: Identifiable {
+struct MessagePreview: Identifiable {
     let id = UUID()
     let name: String
     let lastMessage: String
@@ -19,15 +19,15 @@ struct MessagesView: View {
     @State private var showSearchResults = false
 
     // Static messages for people without conversations yet
-    private let staticMessages: [Message] = [
-        Message(name: "Shaun Jin", lastMessage: "Anyone heading to downtown?", time: "5h ago", unreadCount: 5, iconName: "chat", isGroup: false),
-        Message(name: "CarPal Assistant", lastMessage: "How can I help you today?", time: "1d ago", unreadCount: 0, iconName: "robot", isGroup: false),
-        Message(name: "Jose Andres", lastMessage: "Thanks for the ride!", time: "2d ago", unreadCount: 0, iconName: "chat", isGroup: false),
+    private let staticMessages: [MessagePreview] = [
+        MessagePreview(name: "Shaun Jin", lastMessage: "Anyone heading to downtown?", time: "5h ago", unreadCount: 5, iconName: "chat", isGroup: false),
+        MessagePreview(name: "CarPal Assistant", lastMessage: "How can I help you today?", time: "1d ago", unreadCount: 0, iconName: "robot", isGroup: false),
+        MessagePreview(name: "Jose Andres", lastMessage: "Thanks for the ride!", time: "2d ago", unreadCount: 0, iconName: "chat", isGroup: false),
     ]
     
-    private var allMessages: [Message] {
+    private var allMessages: [MessagePreview] {
         let dynamicMessages = messagesManager.getConversationPreviews().map { preview in
-            Message(name: preview.name, lastMessage: preview.lastMessage, 
+            MessagePreview(name: preview.name, lastMessage: preview.lastMessage, 
                    time: preview.time, unreadCount: preview.unreadCount, 
                    iconName: preview.iconName, isGroup: preview.isGroup)
         }
@@ -152,7 +152,7 @@ struct MessagesView: View {
 
     // MARK: - Message Row
 
-    private func messageRow(_ message: Message) -> some View {
+    private func messageRow(_ message: MessagePreview) -> some View {
         NavigationLink {
             ChatView(contactName: message.name)
         } label: {

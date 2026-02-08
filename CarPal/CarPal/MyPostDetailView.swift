@@ -6,6 +6,7 @@ struct MyPostDetailView: View {
     
     @StateObject private var savedTripsManager = SavedTripsManager.shared
     @StateObject private var postsManager = MyPostsManager.shared
+    @StateObject private var invitationManager = TripInvitationManager.shared
     @State private var showComments = false
     @State private var showShareSheet = false
     @State private var showEditPost = false
@@ -125,6 +126,11 @@ struct MyPostDetailView: View {
                         
                         // Requirements
                         requirementsSection(for: trip)
+                        
+                        Divider()
+                        
+                        // Participants
+                        participantsSection(for: trip)
                         
                         Divider()
                         
@@ -309,6 +315,103 @@ struct MyPostDetailView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
             }
+        }
+    }
+    
+    // MARK: - Participants Section
+    
+    private func participantsSection(for trip: Trip) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Participants")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.gray)
+                
+                Spacer()
+                
+                Text("\(invitationManager.getParticipants(for: trip.id).count) joined")
+                    .font(.system(size: 13))
+                    .foregroundColor(brandBlue)
+            }
+            
+            let participants = invitationManager.getParticipants(for: trip.id)
+            
+            if participants.isEmpty {
+                VStack(spacing: 8) {
+                    Image(systemName: "person.2.slash")
+                        .font(.system(size: 32))
+                        .foregroundColor(.gray.opacity(0.5))
+                    Text("No one has joined yet")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+                .background(Color(.systemGray6).opacity(0.5))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            } else {
+                VStack(spacing: 8) {
+                    ForEach(participants) { participant in
+                        NavigationLink(destination: ChatView(contactName: participant.name)) {
+                            HStack(spacing: 12) {
+                                // Avatar
+                                Circle()
+                                    .fill(brandBlue.opacity(0.2))
+                                    .frame(width: 40, height: 40)
+                                    .overlay(
+                                        Text(String(participant.name.prefix(1)))
+                                            .font(.system(size: 16, weight: .semibold))
+                                            .foregroundColor(brandBlue)
+                                    )
+                                
+                                // Info
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(participant.name)
+                                        .font(.system(size: 15, weight: .medium))
+                                        .foregroundColor(.primary)
+                                    
+                                    Text("Joined \(formatJoinDate(participant.joinedDate))")
+                                        .font(.system(size: 13))
+                                        .foregroundColor(.gray)
+                                }
+                                
+                                Spacer()
+                                
+                                // Status indicator and chevron
+                                HStack(spacing: 8) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(tagGreen)
+                                        .font(.system(size: 18))
+                                    
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.gray)
+                                }
+                            }
+                            .padding(12)
+                            .background(Color(.systemGray6).opacity(0.5))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+            }
+        }
+    }
+    
+    private func formatJoinDate(_ date: Date) -> String {
+        let calendar = Calendar.current
+        let now = Date()
+        let components = calendar.dateComponents([.day, .hour, .minute], from: date, to: now)
+        
+        if let days = components.day, days > 0 {
+            return days == 1 ? "1 day ago" : "\(days) days ago"
+        } else if let hours = components.hour, hours > 0 {
+            return hours == 1 ? "1 hour ago" : "\(hours) hours ago"
+        } else if let minutes = components.minute, minutes > 0 {
+            return minutes == 1 ? "1 minute ago" : "\(minutes) minutes ago"
+        } else {
+            return "just now"
         }
     }
     

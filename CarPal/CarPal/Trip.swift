@@ -20,7 +20,7 @@ struct Trip: Identifiable {
     let authorGender: String
     var description: String
     var capacity: Int
-    let currentParticipants: Int
+    var currentParticipants: Int
     let likes: Int
     let tripDate: Date  // Actual trip date
     

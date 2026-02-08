@@ -1,23 +1,37 @@
 import SwiftUI
 
 struct TripDetailView: View {
-    let trip: Trip
+    let tripId: UUID
     @Environment(\.dismiss) private var dismiss
     
     @StateObject private var savedTripsManager = SavedTripsManager.shared
+    @StateObject private var tripsManager = TripsManager.shared
     @State private var showComments = false
     @State private var showShareSheet = false
     @State private var isLiked = false
     @State private var likesCount: Int
     @State private var navigateToMessages = false
     
+    private var trip: Trip {
+        tripsManager.getTrip(by: tripId) ?? Trip(
+            title: "Unknown Trip",
+            location: "Unknown",
+            setOff: "N/A",
+            arrived: "N/A",
+            tags: [],
+            author: "Unknown",
+            date: "N/A",
+            imageName: "car"
+        )
+    }
+    
     init(trip: Trip) {
-        self.trip = trip
+        self.tripId = trip.id
         _likesCount = State(initialValue: trip.likes)
     }
     
     private var isSaved: Bool {
-        savedTripsManager.isSaved(tripId: trip.id)
+        savedTripsManager.isSaved(tripId: tripId)
     }
     
     private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
@@ -105,7 +119,7 @@ struct TripDetailView: View {
             CommentsView(tripTitle: trip.title)
         }
         .sheet(isPresented: $showShareSheet) {
-            SharePostView(tripTitle: trip.title, tripId: trip.id)
+            SharePostView(tripTitle: trip.title, tripId: tripId)
         }
         .navigationDestination(isPresented: $navigateToMessages) {
             ChatView(contactName: trip.author)
@@ -392,7 +406,7 @@ struct TripDetailView: View {
             
             // Save
             Button {
-                savedTripsManager.toggleSave(tripId: trip.id)
+                savedTripsManager.toggleSave(tripId: tripId)
             } label: {
                 VStack(spacing: 4) {
                     Image(systemName: isSaved ? "bookmark.fill" : "bookmark")
@@ -798,136 +812,6 @@ struct SharePostView: View {
     }
 }
 
-// MARK: - Chat View (for DM)
-
-struct ChatView: View {
-    let contactName: String
-    @Environment(\.dismiss) private var dismiss
-    
-    @StateObject private var messagesManager = MessagesManager.shared
-    @State private var messageText = ""
-    
-    private var messages: [ChatMessage] {
-        messagesManager.getMessages(for: contactName)
-    }
-    
-    private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // Custom navigation bar
-            HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "arrow.left")
-                        .foregroundColor(.primary)
-                }
-                
-                Circle()
-                    .fill(Color(.systemGray5))
-                    .frame(width: 36, height: 36)
-                    .overlay(
-                        Image(systemName: "person.fill")
-                            .font(.system(size: 16))
-                            .foregroundColor(Color(.systemGray2))
-                    )
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(contactName)
-                        .font(.system(size: 16, weight: .semibold))
-                    Text("Active now")
-                        .font(.system(size: 12))
-                        .foregroundColor(.gray)
-                }
-                
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(.ultraThinMaterial)
-            
-            Divider()
-            
-            // Messages
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(spacing: 16) {
-                        ForEach(messages) { message in
-                            HStack {
-                                if message.isSent {
-                                    Spacer()
-                                }
-                                
-                                VStack(alignment: message.isSent ? .trailing : .leading, spacing: 4) {
-                                    MessageBubble(message: message, brandBlue: brandBlue)
-                                    
-                                    Text(message.time)
-                                        .font(.system(size: 11))
-                                        .foregroundColor(.gray)
-                                }
-                                .id(message.id)
-                                
-                                if !message.isSent {
-                                    Spacer()
-                                }
-                            }
-                        }
-                    }
-                    .padding(16)
-                }
-                .onAppear {
-                    if let lastMessage = messages.last {
-                        proxy.scrollTo(lastMessage.id, anchor: .bottom)
-                    }
-                }
-                .onChange(of: messages.count) { _, _ in
-                    if let lastMessage = messages.last {
-                        withAnimation {
-                            proxy.scrollTo(lastMessage.id, anchor: .bottom)
-                        }
-                    }
-                }
-            }
-            
-            // Input area
-            HStack(spacing: 12) {
-                Button {
-                    // Attachment
-                } label: {
-                    Image(systemName: "paperclip")
-                        .font(.system(size: 20))
-                        .foregroundColor(.gray)
-                }
-                
-                TextField("Type a message...", text: $messageText, axis: .vertical)
-                    .lineLimit(1...4)
-                    .padding(10)
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                
-                Button {
-                    if !messageText.isEmpty {
-                        messagesManager.sendMessage(to: contactName, text: messageText, isSent: true)
-                        messageText = ""
-                    }
-                } label: {
-                    Image(systemName: "paperplane.fill")
-                        .font(.system(size: 18))
-                        .foregroundColor(messageText.isEmpty ? .gray : brandBlue)
-                        .frame(width: 36, height: 36)
-                        .background(Circle().fill(Color(.systemGray6)))
-                }
-                .disabled(messageText.isEmpty)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(.ultraThinMaterial)
-        }
-        .navigationBarBackButtonHidden(true)
-    }
-}
-
 // MARK: - Models
 
 struct Comment: Identifiable {
@@ -943,101 +827,6 @@ struct Reply: Identifiable {
     let authorName: String
     let text: String
     let time: String
-}
-
-struct ChatMessage: Identifiable {
-    let id = UUID()
-    let text: String
-    let isSent: Bool
-    let time: String
-}
-
-// MARK: - Message Bubble with Link Detection
-
-struct MessageBubble: View {
-    let message: ChatMessage
-    let brandBlue: Color
-    
-    @State private var showTripDetail = false
-    
-    private var tripId: UUID? {
-        // Extract trip ID from carpal://trip/{uuid} link
-        if let range = message.text.range(of: "carpal://trip/") {
-            let idString = message.text[range.upperBound...].components(separatedBy: CharacterSet.whitespacesAndNewlines)[0]
-            return UUID(uuidString: String(idString))
-        }
-        return nil
-    }
-    
-    private var messageComponents: (text: String, hasLink: Bool) {
-        if message.text.contains("carpal://trip/") {
-            // Split message before the link
-            if let range = message.text.range(of: "carpal://trip/") {
-                let beforeLink = String(message.text[..<range.lowerBound])
-                return (beforeLink.trimmingCharacters(in: .whitespacesAndNewlines), true)
-            }
-        }
-        return (message.text, false)
-    }
-    
-    var body: some View {
-        VStack(alignment: message.isSent ? .trailing : .leading, spacing: 8) {
-            if messageComponents.hasLink {
-                // Text before the link
-                if !messageComponents.text.isEmpty {
-                    Text(messageComponents.text)
-                        .font(.system(size: 15))
-                        .foregroundColor(message.isSent ? .white : .primary)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
-                        .background(message.isSent ? brandBlue : Color(.systemGray6))
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                }
-                
-                // Link as button
-                Button {
-                    if let id = tripId, let trip = findTrip(by: id) {
-                        showTripDetail = true
-                    }
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "car.fill")
-                            .font(.system(size: 16))
-                        Text("View Trip Details")
-                            .font(.system(size: 15, weight: .semibold))
-                        Image(systemName: "arrow.right.circle.fill")
-                            .font(.system(size: 16))
-                    }
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(Color(red: 0.2, green: 0.7, blue: 0.3))
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                }
-            } else {
-                // Regular text message
-                Text(message.text)
-                    .font(.system(size: 15))
-                    .foregroundColor(message.isSent ? .white : .primary)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(message.isSent ? brandBlue : Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-            }
-        }
-        .sheet(isPresented: $showTripDetail) {
-            if let id = tripId, let trip = findTrip(by: id) {
-                NavigationStack {
-                    TripDetailView(trip: trip)
-                }
-            }
-        }
-    }
-    
-    private func findTrip(by id: UUID) -> Trip? {
-        let allTrips = SampleData.recommendedTrips + SampleData.followingTrips
-        return allTrips.first { $0.id == id }
-    }
 }
 
 #Preview {
