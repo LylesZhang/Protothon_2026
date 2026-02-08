@@ -4,11 +4,15 @@ struct TripDetailView: View {
     let trip: Trip
     @Environment(\.dismiss) private var dismiss
     
+    @StateObject private var savedTripsManager = SavedTripsManager.shared
     @State private var showComments = false
     @State private var showShareSheet = false
     @State private var isLiked = false
-    @State private var isSaved = false
     @State private var navigateToMessages = false
+    
+    private var isSaved: Bool {
+        savedTripsManager.isSaved(tripId: trip.id)
+    }
     
     private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
     private let tagGreen = Color(red: 0.2, green: 0.7, blue: 0.3)
@@ -367,7 +371,7 @@ struct TripDetailView: View {
             
             // Save
             Button {
-                isSaved.toggle()
+                savedTripsManager.toggleSave(tripId: trip.id)
             } label: {
                 VStack(spacing: 4) {
                     Image(systemName: isSaved ? "bookmark.fill" : "bookmark")

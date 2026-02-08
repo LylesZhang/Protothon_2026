@@ -1,7 +1,7 @@
 import Foundation
 
 struct Trip: Identifiable {
-    let id = UUID()
+    let id: UUID
     let title: String
     let location: String
     let setOff: String
@@ -28,7 +28,7 @@ struct Trip: Identifiable {
         return tripDate < Date()
     }
     
-    init(title: String, location: String, setOff: String, arrived: String, tags: [String], 
+    init(id: UUID = UUID(), title: String, location: String, setOff: String, arrived: String, tags: [String], 
          author: String, date: String, imageName: String,
          authorPronoun: String = "they/them", authorRating: Double = 4.8, 
          authorCollege: String = "UCLA", authorYear: String = "Junior", 
@@ -36,6 +36,7 @@ struct Trip: Identifiable {
          description: String = "Looking forward to this trip!",
          capacity: Int = 3, currentParticipants: Int = 1,
          likes: Int = 0, tripDate: Date = Date()) {
+        self.id = id
         self.title = title
         self.location = location
         self.setOff = setOff
@@ -58,8 +59,15 @@ struct Trip: Identifiable {
 }
 
 enum SampleData {
+    // Fixed IDs for consistent trip identification
+    static let mountainTripId = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
+    static let coastTripId = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
+    static let cityTripId = UUID(uuidString: "33333333-3333-3333-3333-333333333333")!
+    static let desertTripId = UUID(uuidString: "44444444-4444-4444-4444-444444444444")!
+    
     static let recommendedTrips: [Trip] = [
         Trip(
+            id: mountainTripId,
             title: "Mountain Road Trip Adventure",
             location: "Lake Tahoe, CA",
             setOff: "8:00 AM - 9:00 AM",
@@ -80,6 +88,7 @@ enum SampleData {
             tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 15))!
         ),
         Trip(
+            id: coastTripId,
             title: "Coastal Highway Scenic Drive",
             location: "San Diego, CA",
             setOff: "6:30 AM - 7:00 AM",
@@ -92,6 +101,7 @@ enum SampleData {
             tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 4))!
         ),
         Trip(
+            id: cityTripId,
             title: "Urban City Commute Tips",
             location: "Downtown LA",
             setOff: "7:00 AM - 7:15 AM",
@@ -104,6 +114,7 @@ enum SampleData {
             tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 3))!
         ),
         Trip(
+            id: desertTripId,
             title: "Desert Sunset Route",
             location: "Palm Springs, CA",
             setOff: "3:00 PM - 3:30 PM",

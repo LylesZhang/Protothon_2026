@@ -1,8 +1,16 @@
 import SwiftUI
 
 struct SavedTripsView: View {
-    // In a real app, this would come from a data store
-    @State private var savedTrips: [Trip] = []
+    @StateObject private var savedTripsManager = SavedTripsManager.shared
+    
+    // All available trips (combine from different sources)
+    private var allTrips: [Trip] {
+        return SampleData.recommendedTrips + SampleData.followingTrips
+    }
+    
+    private var savedTrips: [Trip] {
+        return savedTripsManager.getSavedTrips(from: allTrips)
+    }
     
     var body: some View {
         Group {
@@ -43,14 +51,6 @@ struct SavedTripsView: View {
         }
         .navigationTitle("Saved Trips")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            // Load saved trips from UserDefaults or a database
-            // For demo, add some sample data after a moment
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                // This would be replaced with actual saved trips
-                // savedTrips = loadSavedTrips()
-            }
-        }
     }
 }
 

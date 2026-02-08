@@ -137,47 +137,52 @@ struct MessagesView: View {
     // MARK: - Message Row
 
     private func messageRow(_ message: Message) -> some View {
-        HStack(spacing: 14) {
-            // Avatar icon
-            Circle()
-                .fill(Color(.systemGray5))
-                .frame(width: 50, height: 50)
-                .overlay(
-                    Image(systemName: message.iconName == "robot" ? "desktopcomputer" : "bubble.left.fill")
-                        .font(.system(size: 20))
-                        .foregroundColor(message.iconName == "robot" ? brandBlue : Color(.systemGray2))
-                )
+        NavigationLink {
+            ChatView(contactName: message.name)
+        } label: {
+            HStack(spacing: 14) {
+                // Avatar icon
+                Circle()
+                    .fill(Color(.systemGray5))
+                    .frame(width: 50, height: 50)
+                    .overlay(
+                        Image(systemName: message.iconName == "robot" ? "desktopcomputer" : "bubble.left.fill")
+                            .font(.system(size: 20))
+                            .foregroundColor(message.iconName == "robot" ? brandBlue : Color(.systemGray2))
+                    )
 
-            // Name + last message
-            VStack(alignment: .leading, spacing: 4) {
-                Text(message.name)
-                    .font(.system(size: 16, weight: .semibold))
-                Text(message.lastMessage)
-                    .font(.system(size: 14))
-                    .foregroundColor(.gray)
-                    .lineLimit(1)
-            }
+                // Name + last message
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(message.name)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.primary)
+                    Text(message.lastMessage)
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                        .lineLimit(1)
+                }
 
-            Spacer()
+                Spacer()
 
-            // Time + badge
-            VStack(alignment: .trailing, spacing: 6) {
-                Text(message.time)
-                    .font(.system(size: 12))
-                    .foregroundColor(.gray)
+                // Time + badge
+                VStack(alignment: .trailing, spacing: 6) {
+                    Text(message.time)
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
 
-                if message.unreadCount > 0 {
-                    Text("\(message.unreadCount)")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 22, height: 22)
-                        .background(brandBlue)
-                        .clipShape(Circle())
+                    if message.unreadCount > 0 {
+                        Text("\(message.unreadCount)")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 22, height: 22)
+                            .background(brandBlue)
+                            .clipShape(Circle())
+                    }
                 }
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
     }
 }
 
