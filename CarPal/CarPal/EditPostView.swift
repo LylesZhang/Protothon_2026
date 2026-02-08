@@ -25,13 +25,13 @@ struct EditPostView: View {
     init(trip: Trip, onSave: @escaping (Trip) -> Void = { _ in }) {
         self.trip = trip
         self.onSave = onSave
-        _title = State(initialValue: trip.title)
-        _origin = State(initialValue: trip.origin)
-        _destination = State(initialValue: trip.location)
+        _title = State(initialValue: trip.title.isEmpty ? "Untitled Trip" : trip.title)
+        _origin = State(initialValue: trip.origin.isEmpty ? "" : trip.origin)
+        _destination = State(initialValue: trip.location.isEmpty ? "" : trip.location)
         _capacity = State(initialValue: String(trip.capacity))
-        _departureWindow = State(initialValue: trip.setOff)
-        _arrivalWindow = State(initialValue: trip.arrived)
-        _description = State(initialValue: trip.description)
+        _departureWindow = State(initialValue: trip.setOff.isEmpty ? "" : trip.setOff)
+        _arrivalWindow = State(initialValue: trip.arrived.isEmpty ? "" : trip.arrived)
+        _description = State(initialValue: trip.description.isEmpty ? "" : trip.description)
         _tags = State(initialValue: trip.tags)
     }
     

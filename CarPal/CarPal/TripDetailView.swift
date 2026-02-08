@@ -6,14 +6,26 @@ struct TripDetailView: View {
     
     @StateObject private var savedTripsManager = SavedTripsManager.shared
     @StateObject private var tripsManager = TripsManager.shared
+    @StateObject private var invitationManager = TripInvitationManager.shared
+    @StateObject private var myPostsManager = MyPostsManager.shared
     @State private var showComments = false
     @State private var showShareSheet = false
     @State private var isLiked = false
     @State private var likesCount: Int
     @State private var navigateToMessages = false
+    @State private var showJoinRequestConfirmation = false
     
     private var trip: Trip {
-        tripsManager.getTrip(by: tripId) ?? Trip(
+        // Try to get from TripsManager first
+        if let trip = tripsManager.getTrip(by: tripId) {
+            return trip
+        }
+        // Then try MyPostsManager for user's own posts
+        if let trip = myPostsManager.getPost(by: tripId) {
+            return trip
+        }
+        // Fallback to Unknown Trip
+        return Trip(
             title: "Unknown Trip",
             location: "Unknown",
             setOff: "N/A",
@@ -124,6 +136,17 @@ struct TripDetailView: View {
         .navigationDestination(isPresented: $navigateToMessages) {
             ChatView(contactName: trip.author)
         }
+        .alert("Request Sent!", isPresented: $showJoinRequestConfirmation) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Your join request has been sent to \(trip.author). You'll be notified when they respond.")
+        }
+    }
+    
+    private func sendJoinRequest() {
+        // Send join request message to the trip author
+        invitationManager.sendJoinRequest(trip: trip, from: "You", to: trip.author)
+        showJoinRequestConfirmation = true
     }
     
     // MARK: - Hero Image
@@ -367,6 +390,20 @@ struct TripDetailView: View {
                         .font(.system(size: 11))
                 }
                 .foregroundColor(.primary)
+                .frame(maxWidth: .infinity)
+            }
+            
+            // Request to Join
+            Button {
+                sendJoinRequest()
+            } label: {
+                VStack(spacing: 4) {
+                    Image(systemName: "person.badge.plus")
+                        .font(.system(size: 20))
+                    Text("Join")
+                        .font(.system(size: 11))
+                }
+                .foregroundColor(brandBlue)
                 .frame(maxWidth: .infinity)
             }
             
@@ -799,13 +836,28 @@ struct SharePostView: View {
         // Generate a deep link for the trip
         let tripLink = "carpal://trip/\(tripId.uuidString)"
         
-        let messageText = "Check out this trip: \(tripTitle)\n\n🚗 Tap to view details:\n\(tripLink)"
-        
         // Send message to each selected person
         let messagesManager = MessagesManager.shared
         for person in selectedPeople {
-            messagesManager.sendMessage(to: person, text: messageText, isSent: true)
-            print("Sent to \(person): \(messageText)")
+            // Send a text message first
+            let textMessage = Message(
+                sender: "You",
+                content: "Check out this trip: \(tripTitle)",
+                timestamp: Date(),
+                type: .text
+            )
+            messagesManager.sendMessage(textMessage, to: person)
+            
+            // Then send the link as a button
+            let linkMessage = Message(
+                sender: "You",
+                content: "View Trip Details",
+                timestamp: Date(),
+                type: .link(tripLink)
+            )
+            messagesManager.sendMessage(linkMessage, to: person)
+            
+            print("Sent trip link to \(person): \(tripLink)")
         }
         
         showAlert = true

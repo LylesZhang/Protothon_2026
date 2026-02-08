@@ -35,6 +35,9 @@ class MyPostsManager: ObservableObject {
             myPosts[index] = updatedTrip
             print("✅ Post updated at index \(index)")
             print("🏷️ Saved tags: \(myPosts[index].tags)")
+            
+            // Notify SavedTripsManager to refresh if this trip is saved
+            SavedTripsManager.shared.refreshSavedTrip(tripId: updatedTrip.id)
         } else {
             print("❌ Post not found!")
         }

@@ -2,14 +2,10 @@ import SwiftUI
 
 struct SavedTripsView: View {
     @StateObject private var savedTripsManager = SavedTripsManager.shared
-    
-    // All available trips (combine from different sources)
-    private var allTrips: [Trip] {
-        return SampleData.recommendedTrips + SampleData.followingTrips
-    }
+    @StateObject private var tripsManager = TripsManager.shared
     
     private var savedTrips: [Trip] {
-        return savedTripsManager.getSavedTrips(from: allTrips)
+        return savedTripsManager.getSavedTrips()
     }
     
     var body: some View {

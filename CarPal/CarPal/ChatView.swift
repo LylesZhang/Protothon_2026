@@ -14,6 +14,8 @@ struct ChatView: View {
     @State private var currentRatingTripId: UUID?
     @State private var acceptedInvitationIds: Set<UUID> = []
     @State private var declinedInvitationIds: Set<UUID> = []
+    @State private var acceptedRequestIds: Set<UUID> = []
+    @State private var declinedRequestIds: Set<UUID> = []
     
     private var messages: [Message] {
         messagesManager.getMessages(for: contactName)
@@ -69,6 +71,8 @@ struct ChatView: View {
                                 tagGreen: tagGreen,
                                 acceptedInvitationIds: acceptedInvitationIds,
                                 declinedInvitationIds: declinedInvitationIds,
+                                acceptedRequestIds: acceptedRequestIds,
+                                declinedRequestIds: declinedRequestIds,
                                 onAcceptInvitation: { invitation in
                                     withAnimation {
                                         acceptedInvitationIds.insert(invitation.id)
@@ -80,6 +84,18 @@ struct ChatView: View {
                                         declinedInvitationIds.insert(invitation.id)
                                     }
                                     invitationManager.declineInvitation(invitation)
+                                },
+                                onAcceptJoinRequest: { request in
+                                    withAnimation {
+                                        acceptedRequestIds.insert(request.id)
+                                    }
+                                    invitationManager.acceptJoinRequest(request)
+                                },
+                                onDeclineJoinRequest: { request in
+                                    withAnimation {
+                                        declinedRequestIds.insert(request.id)
+                                    }
+                                    invitationManager.declineJoinRequest(request)
                                 },
                                 onConfirmFinished: { tripId in
                                     invitationManager.confirmTripFinished(tripId, conversationId: contactName)
@@ -161,8 +177,12 @@ struct MessageRow: View {
     let tagGreen: Color
     let acceptedInvitationIds: Set<UUID>
     let declinedInvitationIds: Set<UUID>
+    let acceptedRequestIds: Set<UUID>
+    let declinedRequestIds: Set<UUID>
     let onAcceptInvitation: (TripInvitation) -> Void
     let onDeclineInvitation: (TripInvitation) -> Void
+    let onAcceptJoinRequest: (JoinRequest) -> Void
+    let onDeclineJoinRequest: (JoinRequest) -> Void
     let onConfirmFinished: (UUID) -> Void
     let onShowRating: (UUID) -> Void
     
@@ -195,6 +215,18 @@ struct MessageRow: View {
                         tagGreen: tagGreen,
                         onAccept: { onAcceptInvitation(invitation) },
                         onDecline: { onDeclineInvitation(invitation) }
+                    )
+                    
+                case .joinRequest(let request):
+                    JoinRequestBubble(
+                        request: request,
+                        isSent: isSent,
+                        isAccepted: acceptedRequestIds.contains(request.id),
+                        isDeclined: declinedRequestIds.contains(request.id),
+                        brandBlue: brandBlue,
+                        tagGreen: tagGreen,
+                        onAccept: { onAcceptJoinRequest(request) },
+                        onDecline: { onDeclineJoinRequest(request) }
                     )
                     
                 case .finishPrompt(let tripId):
@@ -250,26 +282,43 @@ struct LinkMessageBubble: View {
     let brandBlue: Color
     let tagGreen: Color
     
+    @State private var showTripDetail = false
+    
     var body: some View {
-        Button {
-            if let tripId = extractTripId(from: url) {
-                // Navigate to trip detail
-                print("Navigate to trip: \(tripId)")
+        if let tripId = extractTripId(from: url),
+           let trip = findTrip(by: tripId) {
+            NavigationLink(destination: TripDetailView(trip: trip)) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "car.fill")
+                            .font(.system(size: 14))
+                        Text("View Trip Details")
+                            .font(.system(size: 14, weight: .semibold))
+                        Spacer()
+                        Image(systemName: "arrow.right.circle.fill")
+                            .font(.system(size: 16))
+                    }
+                    .foregroundColor(.white)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .frame(maxWidth: 250, alignment: .leading)
+                .background(tagGreen)
+                .clipShape(RoundedRectangle(cornerRadius: 18))
             }
-        } label: {
+        } else {
             VStack(alignment: .leading, spacing: 4) {
                 Text("View Trip Details")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.white)
-                Text(url)
+                Text("Link unavailable")
                     .font(.system(size: 11))
-                    .foregroundColor(.white.opacity(0.8))
-                    .lineLimit(1)
+                    .foregroundColor(.white.opacity(0.6))
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
             .frame(maxWidth: 250, alignment: .leading)
-            .background(tagGreen)
+            .background(Color.gray)
             .clipShape(RoundedRectangle(cornerRadius: 18))
         }
     }
@@ -281,6 +330,18 @@ struct LinkMessageBubble: View {
             return nil
         }
         return uuid
+    }
+    
+    private func findTrip(by id: UUID) -> Trip? {
+        // Search in TripsManager
+        if let trip = TripsManager.shared.getTrip(by: id) {
+            return trip
+        }
+        // Search in MyPostsManager
+        if let trip = MyPostsManager.shared.getPost(by: id) {
+            return trip
+        }
+        return nil
     }
 }
 
@@ -326,6 +387,114 @@ struct InvitationBubble: View {
                 
                 Text(invitation.destination)
                     .font(.system(size: 16, weight: .bold))
+                
+                if !isSent {
+                    if isAccepted {
+                        // Accepted status
+                        HStack {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(tagGreen)
+                            Text("Accepted")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(tagGreen)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(tagGreen.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    } else if isDeclined {
+                        // Declined status
+                        HStack {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.red)
+                            Text("Declined")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(.red)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(Color.red.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    } else {
+                        HStack(spacing: 8) {
+                            // Accept button
+                            Button {
+                                onAccept()
+                            } label: {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 14, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(tagGreen)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            
+                            // Decline button
+                            Button {
+                                onDecline()
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 14, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(Color.red.opacity(0.3))
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(14)
+            .background(.white)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color(.systemGray4), lineWidth: 1)
+        )
+        .frame(maxWidth: 280)
+    }
+}
+
+// MARK: - Join Request Bubble
+
+struct JoinRequestBubble: View {
+    let request: JoinRequest
+    let isSent: Bool
+    let isAccepted: Bool
+    let isDeclined: Bool
+    let brandBlue: Color
+    let tagGreen: Color
+    let onAccept: () -> Void
+    let onDecline: () -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Header
+            HStack {
+                Text("Join Request")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+                Spacer()
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(Color.orange)
+            
+            // Content
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Request to join trip:")
+                    .font(.system(size: 13))
+                    .foregroundColor(.gray)
+                
+                Text(request.destination)
+                    .font(.system(size: 16, weight: .bold))
+                
+                Text("From: \(request.origin)")
+                    .font(.system(size: 13))
+                    .foregroundColor(.gray)
                 
                 if !isSent {
                     if isAccepted {

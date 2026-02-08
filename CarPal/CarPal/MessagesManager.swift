@@ -6,6 +6,7 @@ enum MessageType: Codable {
     case text
     case link(String)
     case invitation(TripInvitation)
+    case joinRequest(JoinRequest)
     case finishPrompt(UUID)
     case ratingPrompt(UUID)
 }
@@ -126,6 +127,14 @@ class MessagesManager: ObservableObject {
         conversations["Mike Johnson"] = [
             Message(sender: "Mike Johnson", content: "Thanks for sharing!", timestamp: Date().addingTimeInterval(-3600), type: .text)
         ]
+        
+        // Initialize empty conversations for other users to avoid blank screen
+        let otherUsers = ["Emma Wilson", "Alex Rivera", "Shaun Jin", "Jose Andres", "Amy Liu", "Carlos Ruiz"]
+        for user in otherUsers {
+            if conversations[user] == nil {
+                conversations[user] = []
+            }
+        }
     }
 }
 

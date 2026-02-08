@@ -7,6 +7,7 @@ class TripInvitationManager: ObservableObject {
     @Published var activeInvitations: [TripInvitation] = []
     @Published var acceptedTrips: [AcceptedTrip] = []
     @Published var tripParticipants: [UUID: [TripParticipant]] = [:]
+    @Published var activeJoinRequests: [JoinRequest] = []
     
     func sendInvitation(trip: Trip, to user: String, conversationId: String) {
         let invitation = TripInvitation(
@@ -69,6 +70,73 @@ class TripInvitationManager: ObservableObject {
     
     func declineInvitation(_ invitation: TripInvitation) {
         activeInvitations.removeAll { $0.id == invitation.id }
+    }
+    
+    func sendJoinRequest(trip: Trip, from requester: String, to tripAuthor: String) {
+        let request = JoinRequest(
+            tripId: trip.id,
+            tripTitle: trip.title,
+            destination: trip.location,
+            origin: trip.origin,
+            requesterName: requester,
+            conversationId: tripAuthor
+        )
+        activeJoinRequests.append(request)
+        
+        // Send join request message
+        let requestMessage = Message(
+            sender: requester,
+            content: "Join Request",
+            timestamp: Date(),
+            type: .joinRequest(request)
+        )
+        MessagesManager.shared.sendMessage(requestMessage, to: tripAuthor)
+    }
+    
+    func acceptJoinRequest(_ request: JoinRequest) {
+        // Remove from active requests
+        activeJoinRequests.removeAll { $0.id == request.id }
+        
+        // Add participant to the trip
+        let participant = TripParticipant(
+            name: request.requesterName,
+            joinedDate: Date()
+        )
+        if tripParticipants[request.tripId] == nil {
+            tripParticipants[request.tripId] = []
+        }
+        tripParticipants[request.tripId]?.append(participant)
+        
+        // Update trip participant count in MyPosts if it's user's own post
+        if let index = MyPostsManager.shared.myPosts.firstIndex(where: { $0.id == request.tripId }) {
+            MyPostsManager.shared.myPosts[index].currentParticipants += 1
+        }
+        
+        // Also update in TripsManager
+        TripsManager.shared.incrementParticipants(for: request.tripId)
+        
+        // Send acceptance confirmation message
+        let confirmMessage = Message(
+            sender: "You",
+            content: "Great! Your request to join the trip has been accepted. See you there! 🚗",
+            timestamp: Date(),
+            type: .text
+        )
+        MessagesManager.shared.sendMessage(confirmMessage, to: request.requesterName)
+    }
+    
+    func declineJoinRequest(_ request: JoinRequest) {
+        // Remove from active requests
+        activeJoinRequests.removeAll { $0.id == request.id }
+        
+        // Optionally send a decline message
+        let declineMessage = Message(
+            sender: "You",
+            content: "Sorry, the trip is full or doesn't match your requirements at this time.",
+            timestamp: Date(),
+            type: .text
+        )
+        MessagesManager.shared.sendMessage(declineMessage, to: request.requesterName)
     }
     
     func getParticipants(for tripId: UUID) -> [TripParticipant] {
@@ -212,5 +280,27 @@ struct TripParticipant: Identifiable {
         self.id = id
         self.name = name
         self.joinedDate = joinedDate
+    }
+}
+
+struct JoinRequest: Identifiable, Codable {
+    let id: UUID
+    let tripId: UUID
+    let tripTitle: String
+    let destination: String
+    let origin: String
+    let requesterName: String
+    let conversationId: String
+    let timestamp: Date
+    
+    init(id: UUID = UUID(), tripId: UUID, tripTitle: String, destination: String, origin: String, requesterName: String, conversationId: String) {
+        self.id = id
+        self.tripId = tripId
+        self.tripTitle = tripTitle
+        self.destination = destination
+        self.origin = origin
+        self.requesterName = requesterName
+        self.conversationId = conversationId
+        self.timestamp = Date()
     }
 }
