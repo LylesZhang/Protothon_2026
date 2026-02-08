@@ -197,11 +197,22 @@ struct TripCard: View {
 
             Divider()
 
-            // Author & date
+            // Author & date & likes
             HStack {
                 Text("\(trip.author)  ·  \(trip.date)")
                     .font(.system(size: 13))
                     .foregroundColor(.gray)
+                
+                Spacer()
+                
+                HStack(spacing: 4) {
+                    Image(systemName: "heart.fill")
+                        .foregroundColor(.red)
+                        .font(.system(size: 12))
+                    Text("\(trip.likes)")
+                        .font(.system(size: 13))
+                        .foregroundColor(.gray)
+                }
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 10)

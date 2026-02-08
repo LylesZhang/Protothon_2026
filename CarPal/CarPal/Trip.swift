@@ -20,6 +20,13 @@ struct Trip: Identifiable {
     let description: String
     let capacity: Int
     let currentParticipants: Int
+    let likes: Int
+    let tripDate: Date  // Actual trip date
+    
+    // Computed property to check if trip is finished
+    var isFinished: Bool {
+        return tripDate < Date()
+    }
     
     init(title: String, location: String, setOff: String, arrived: String, tags: [String], 
          author: String, date: String, imageName: String,
@@ -27,7 +34,8 @@ struct Trip: Identifiable {
          authorCollege: String = "UCLA", authorYear: String = "Junior", 
          authorGender: String = "Female", 
          description: String = "Looking forward to this trip!",
-         capacity: Int = 3, currentParticipants: Int = 1) {
+         capacity: Int = 3, currentParticipants: Int = 1,
+         likes: Int = 0, tripDate: Date = Date()) {
         self.title = title
         self.location = location
         self.setOff = setOff
@@ -44,6 +52,8 @@ struct Trip: Identifiable {
         self.description = description
         self.capacity = capacity
         self.currentParticipants = currentParticipants
+        self.likes = likes
+        self.tripDate = tripDate
     }
 }
 
@@ -52,11 +62,11 @@ enum SampleData {
         Trip(
             title: "Mountain Road Trip Adventure",
             location: "Lake Tahoe, CA",
-            setOff: "8:00 AM",
-            arrived: "12:30 PM",
+            setOff: "8:00 AM - 9:00 AM",
+            arrived: "12:30 PM - 1:30 PM",
             tags: ["Pet Allow", "Prefer Female", "No Smoking"],
             author: "Sarah Chen",
-            date: "Feb 5, 2026",
+            date: "Feb 15, 2026",
             imageName: "mountain",
             authorPronoun: "she/her",
             authorRating: 4.8,
@@ -65,37 +75,45 @@ enum SampleData {
             authorGender: "Female",
             description: "Planning a scenic drive to Lake Tahoe this weekend! Looking for someone to share the ride and split gas costs. I love listening to music and good conversation. My car has plenty of space for luggage. Let me know if you are interested!",
             capacity: 3,
-            currentParticipants: 1
+            currentParticipants: 1,
+            likes: 234,
+            tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 15))!
         ),
         Trip(
             title: "Coastal Highway Scenic Drive",
             location: "San Diego, CA",
-            setOff: "6:30 AM",
-            arrived: "10:00 AM",
+            setOff: "6:30 AM - 7:00 AM",
+            arrived: "10:00 AM - 10:30 AM",
             tags: ["Music OK", "Chat Welcome"],
             author: "Mike Johnson",
             date: "Feb 4, 2026",
-            imageName: "coast"
+            imageName: "coast",
+            likes: 89,
+            tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 4))!
         ),
         Trip(
             title: "Urban City Commute Tips",
             location: "Downtown LA",
-            setOff: "7:00 AM",
-            arrived: "8:15 AM",
+            setOff: "7:00 AM - 7:15 AM",
+            arrived: "8:15 AM - 8:30 AM",
             tags: ["No Smoking", "Quiet Ride"],
             author: "Amy Liu",
             date: "Feb 3, 2026",
-            imageName: "city"
+            imageName: "city",
+            likes: 156,
+            tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 3))!
         ),
         Trip(
             title: "Desert Sunset Route",
             location: "Palm Springs, CA",
-            setOff: "3:00 PM",
-            arrived: "5:45 PM",
+            setOff: "3:00 PM - 3:30 PM",
+            arrived: "5:45 PM - 6:15 PM",
             tags: ["Pet Allow", "Music OK"],
             author: "Carlos Ruiz",
             date: "Feb 2, 2026",
-            imageName: "desert"
+            imageName: "desert",
+            likes: 201,
+            tripDate: Calendar.current.date(from: DateComponents(year: 2026, month: 2, day: 2))!
         ),
     ]
 

@@ -208,7 +208,7 @@ struct TripDetailView: View {
                     Text("Departure:")
                         .font(.system(size: 14))
                         .foregroundColor(.gray)
-                    Text("\(trip.setOff) - \(addTimeWindow(trip.setOff))")
+                    Text("\(trip.date), \(trip.setOff)")
                         .font(.system(size: 15, weight: .medium))
                 }
                 
@@ -218,7 +218,7 @@ struct TripDetailView: View {
                     Text("Arrival:")
                         .font(.system(size: 14))
                         .foregroundColor(.gray)
-                    Text("\(trip.arrived) - \(addTimeWindow(trip.arrived))")
+                    Text("\(trip.date), \(trip.arrived)")
                         .font(.system(size: 15, weight: .medium))
                 }
             }
@@ -269,24 +269,52 @@ struct TripDetailView: View {
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(.gray)
             
-            HStack(spacing: 8) {
-                Circle()
-                    .fill(trip.currentParticipants >= trip.capacity ? .red : tagGreen)
-                    .frame(width: 12, height: 12)
-                
-                Text(trip.currentParticipants >= trip.capacity ? "Full" : "Available")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(trip.currentParticipants >= trip.capacity ? .red : tagGreen)
-                
-                Spacer()
-                
-                Text("\(trip.currentParticipants) / \(trip.capacity) people")
+            if trip.isFinished {
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(.gray)
+                        .frame(width: 12, height: 12)
+                    
+                    Text("Trip already finished")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(.gray)
+                    
+                    Spacer()
+                }
+                .padding(12)
+                .background(Color(.systemGray6))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            } else {
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(trip.currentParticipants >= trip.capacity ? .red : tagGreen)
+                        .frame(width: 12, height: 12)
+                    
+                    Text(trip.currentParticipants >= trip.capacity ? "Full" : "Available")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(trip.currentParticipants >= trip.capacity ? .red : tagGreen)
+                    
+                    Spacer()
+                    
+                    Text("\(trip.currentParticipants) / \(trip.capacity) people")
+                        .font(.system(size: 15))
+                        .foregroundColor(.gray)
+                }
+                .padding(12)
+                .background(Color(.systemGray6))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            
+            // Likes count
+            HStack(spacing: 6) {
+                Image(systemName: "heart.fill")
+                    .foregroundColor(.red)
+                    .font(.system(size: 14))
+                Text("\(trip.likes) likes")
                     .font(.system(size: 15))
                     .foregroundColor(.gray)
             }
-            .padding(12)
-            .background(Color(.systemGray6))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .padding(.top, 4)
         }
     }
     
@@ -687,15 +715,13 @@ struct ChatView: View {
     @Environment(\.dismiss) private var dismiss
     
     @State private var messageText = ""
-    
-    private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
-    
-    // Sample messages
-    private let messages: [ChatMessage] = [
+    @State private var messages: [ChatMessage] = [
         ChatMessage(text: "Hi! Thanks for your interest in the trip!", isSent: false, time: "10:30 AM"),
         ChatMessage(text: "Hello! I saw your post and would love to join.", isSent: true, time: "10:32 AM"),
         ChatMessage(text: "That is great! Are you okay with the departure time?", isSent: false, time: "10:35 AM")
     ]
+    
+    private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
     
     var body: some View {
         VStack(spacing: 0) {
@@ -734,35 +760,45 @@ struct ChatView: View {
             Divider()
             
             // Messages
-            ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(messages) { message in
-                        HStack {
-                            if message.isSent {
-                                Spacer()
-                            }
-                            
-                            VStack(alignment: message.isSent ? .trailing : .leading, spacing: 4) {
-                                Text(message.text)
-                                    .font(.system(size: 15))
-                                    .foregroundColor(message.isSent ? .white : .primary)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 12)
-                                    .background(message.isSent ? brandBlue : Color(.systemGray6))
-                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(messages) { message in
+                            HStack {
+                                if message.isSent {
+                                    Spacer()
+                                }
                                 
-                                Text(message.time)
-                                    .font(.system(size: 11))
-                                    .foregroundColor(.gray)
-                            }
-                            
-                            if !message.isSent {
-                                Spacer()
+                                VStack(alignment: message.isSent ? .trailing : .leading, spacing: 4) {
+                                    Text(message.text)
+                                        .font(.system(size: 15))
+                                        .foregroundColor(message.isSent ? .white : .primary)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 12)
+                                        .background(message.isSent ? brandBlue : Color(.systemGray6))
+                                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                                    
+                                    Text(message.time)
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.gray)
+                                }
+                                .id(message.id)
+                                
+                                if !message.isSent {
+                                    Spacer()
+                                }
                             }
                         }
                     }
+                    .padding(16)
                 }
-                .padding(16)
+                .onChange(of: messages.count) { _, _ in
+                    if let lastMessage = messages.last {
+                        withAnimation {
+                            proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                        }
+                    }
+                }
             }
             
             // Input area
@@ -783,7 +819,11 @@ struct ChatView: View {
                 
                 Button {
                     if !messageText.isEmpty {
-                        // TODO: Send message
+                        let formatter = DateFormatter()
+                        formatter.dateFormat = "h:mm a"
+                        let timeString = formatter.string(from: Date())
+                        
+                        messages.append(ChatMessage(text: messageText, isSent: true, time: timeString))
                         messageText = ""
                     }
                 } label: {

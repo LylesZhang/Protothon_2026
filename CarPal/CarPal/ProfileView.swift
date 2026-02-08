@@ -23,6 +23,11 @@ struct ProfileView: View {
                             destination: HistoryView()
                         )
                         ProfileMenuItem(
+                            title: "Saved Trips",
+                            subtitle: "Trips you've saved for later",
+                            destination: SavedTripsView()
+                        )
+                        ProfileMenuItem(
                             title: "Messages",
                             subtitle: "Messages, group chats, and chatbot",
                             destination: MessagesView()
