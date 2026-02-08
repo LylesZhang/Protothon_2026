@@ -30,7 +30,12 @@ struct HomeView: View {
                         : SampleData.followingTrips
 
                     ForEach(trips) { trip in
-                        TripCard(trip: trip)
+                        NavigationLink {
+                            TripDetailView(trip: trip)
+                        } label: {
+                            TripCard(trip: trip)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
                 .padding(.horizontal, 16)

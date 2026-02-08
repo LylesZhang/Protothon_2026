@@ -28,7 +28,12 @@ struct HistoryView: View {
         ScrollView {
             VStack(spacing: 12) {
                 ForEach(historyTrips) { trip in
-                    TripCard(trip: trip)
+                    NavigationLink {
+                        TripDetailView(trip: trip)
+                    } label: {
+                        TripCard(trip: trip)
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
             .padding(.horizontal, 16)
