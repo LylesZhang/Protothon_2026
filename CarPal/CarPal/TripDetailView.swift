@@ -775,15 +775,13 @@ struct SharePostView: View {
         // Generate a deep link for the trip
         let tripLink = "carpal://trip/\(tripId.uuidString)"
         
-        // In a real app, this would:
-        // 1. Send a message to each selected person with the link
-        // 2. The link would deep link to TripDetailView when tapped
-        // For now, we'll show an alert
+        let messageText = "Check out this trip: \(tripTitle)\n\n🚗 Tap to view details:\n\(tripLink)"
         
-        // Simulate sending message with link
+        // Send message to each selected person
+        let messagesManager = MessagesManager.shared
         for person in selectedPeople {
-            // sendMessage(to: person, message: "Check out this trip: \(tripTitle)\n\(tripLink)")
-            print("Sent to \(person): Check out this trip: \(tripTitle)\nLink: \(tripLink)")
+            messagesManager.sendMessage(to: person, text: messageText, isSent: true)
+            print("Sent to \(person): \(messageText)")
         }
         
         showAlert = true
@@ -796,12 +794,12 @@ struct ChatView: View {
     let contactName: String
     @Environment(\.dismiss) private var dismiss
     
+    @StateObject private var messagesManager = MessagesManager.shared
     @State private var messageText = ""
-    @State private var messages: [ChatMessage] = [
-        ChatMessage(text: "Hi! Thanks for your interest in the trip!", isSent: false, time: "10:30 AM"),
-        ChatMessage(text: "Hello! I saw your post and would love to join.", isSent: true, time: "10:32 AM"),
-        ChatMessage(text: "That is great! Are you okay with the departure time?", isSent: false, time: "10:35 AM")
-    ]
+    
+    private var messages: [ChatMessage] {
+        messagesManager.getMessages(for: contactName)
+    }
     
     private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
     
@@ -852,13 +850,7 @@ struct ChatView: View {
                                 }
                                 
                                 VStack(alignment: message.isSent ? .trailing : .leading, spacing: 4) {
-                                    Text(message.text)
-                                        .font(.system(size: 15))
-                                        .foregroundColor(message.isSent ? .white : .primary)
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 12)
-                                        .background(message.isSent ? brandBlue : Color(.systemGray6))
-                                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                                    MessageBubble(message: message, brandBlue: brandBlue)
                                     
                                     Text(message.time)
                                         .font(.system(size: 11))
@@ -873,6 +865,11 @@ struct ChatView: View {
                         }
                     }
                     .padding(16)
+                }
+                .onAppear {
+                    if let lastMessage = messages.last {
+                        proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                    }
                 }
                 .onChange(of: messages.count) { _, _ in
                     if let lastMessage = messages.last {
@@ -901,11 +898,7 @@ struct ChatView: View {
                 
                 Button {
                     if !messageText.isEmpty {
-                        let formatter = DateFormatter()
-                        formatter.dateFormat = "h:mm a"
-                        let timeString = formatter.string(from: Date())
-                        
-                        messages.append(ChatMessage(text: messageText, isSent: true, time: timeString))
+                        messagesManager.sendMessage(to: contactName, text: messageText, isSent: true)
                         messageText = ""
                     }
                 } label: {
@@ -947,6 +940,94 @@ struct ChatMessage: Identifiable {
     let text: String
     let isSent: Bool
     let time: String
+}
+
+// MARK: - Message Bubble with Link Detection
+
+struct MessageBubble: View {
+    let message: ChatMessage
+    let brandBlue: Color
+    
+    @State private var showTripDetail = false
+    
+    private var tripId: UUID? {
+        // Extract trip ID from carpal://trip/{uuid} link
+        if let range = message.text.range(of: "carpal://trip/") {
+            let idString = message.text[range.upperBound...].components(separatedBy: CharacterSet.whitespacesAndNewlines)[0]
+            return UUID(uuidString: String(idString))
+        }
+        return nil
+    }
+    
+    private var messageComponents: (text: String, hasLink: Bool) {
+        if message.text.contains("carpal://trip/") {
+            // Split message before the link
+            if let range = message.text.range(of: "carpal://trip/") {
+                let beforeLink = String(message.text[..<range.lowerBound])
+                return (beforeLink.trimmingCharacters(in: .whitespacesAndNewlines), true)
+            }
+        }
+        return (message.text, false)
+    }
+    
+    var body: some View {
+        VStack(alignment: message.isSent ? .trailing : .leading, spacing: 8) {
+            if messageComponents.hasLink {
+                // Text before the link
+                if !messageComponents.text.isEmpty {
+                    Text(messageComponents.text)
+                        .font(.system(size: 15))
+                        .foregroundColor(message.isSent ? .white : .primary)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(message.isSent ? brandBlue : Color(.systemGray6))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                }
+                
+                // Link as button
+                Button {
+                    if let id = tripId, let trip = findTrip(by: id) {
+                        showTripDetail = true
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "car.fill")
+                            .font(.system(size: 16))
+                        Text("View Trip Details")
+                            .font(.system(size: 15, weight: .semibold))
+                        Image(systemName: "arrow.right.circle.fill")
+                            .font(.system(size: 16))
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(Color(red: 0.2, green: 0.7, blue: 0.3))
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                }
+            } else {
+                // Regular text message
+                Text(message.text)
+                    .font(.system(size: 15))
+                    .foregroundColor(message.isSent ? .white : .primary)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(message.isSent ? brandBlue : Color(.systemGray6))
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+            }
+        }
+        .sheet(isPresented: $showTripDetail) {
+            if let id = tripId, let trip = findTrip(by: id) {
+                NavigationStack {
+                    TripDetailView(trip: trip)
+                }
+            }
+        }
+    }
+    
+    private func findTrip(by id: UUID) -> Trip? {
+        let allTrips = SampleData.recommendedTrips + SampleData.followingTrips
+        return allTrips.first { $0.id == id }
+    }
 }
 
 #Preview {

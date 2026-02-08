@@ -11,17 +11,33 @@ struct Message: Identifiable {
 }
 
 struct MessagesView: View {
+    @StateObject private var messagesManager = MessagesManager.shared
+    
     private let brandBlue = Color(red: 0.231, green: 0.357, blue: 0.906)
 
     @State private var searchText = ""
     @State private var showSearchResults = false
 
-    private let messages: [Message] = [
-        Message(name: "Oscar Tang", lastMessage: "Sure! See you at 8 AM tomorrow.", time: "2h ago", unreadCount: 2, iconName: "chat", isGroup: false),
+    // Static messages for people without conversations yet
+    private let staticMessages: [Message] = [
         Message(name: "Shaun Jin", lastMessage: "Anyone heading to downtown?", time: "5h ago", unreadCount: 5, iconName: "chat", isGroup: false),
         Message(name: "CarPal Assistant", lastMessage: "How can I help you today?", time: "1d ago", unreadCount: 0, iconName: "robot", isGroup: false),
         Message(name: "Jose Andres", lastMessage: "Thanks for the ride!", time: "2d ago", unreadCount: 0, iconName: "chat", isGroup: false),
     ]
+    
+    private var allMessages: [Message] {
+        let dynamicMessages = messagesManager.getConversationPreviews().map { preview in
+            Message(name: preview.name, lastMessage: preview.lastMessage, 
+                   time: preview.time, unreadCount: preview.unreadCount, 
+                   iconName: preview.iconName, isGroup: preview.isGroup)
+        }
+        
+        // Combine and remove duplicates
+        let allNames = Set(dynamicMessages.map { $0.name })
+        let filteredStatic = staticMessages.filter { !allNames.contains($0.name) }
+        
+        return dynamicMessages + filteredStatic
+    }
 
     // Searchable contacts (Followers + Following only)
     private let contacts: [String] = [
@@ -79,9 +95,9 @@ struct MessagesView: View {
     private var messageList: some View {
         ScrollView {
             VStack(spacing: 0) {
-                ForEach(Array(messages.enumerated()), id: \.element.id) { index, message in
+                ForEach(Array(allMessages.enumerated()), id: \.element.id) { index, message in
                     messageRow(message)
-                    if index < messages.count - 1 {
+                    if index < allMessages.count - 1 {
                         Divider().padding(.leading, 76)
                     }
                 }
